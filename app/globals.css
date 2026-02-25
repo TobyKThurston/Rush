@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #F8F6F2;
+}
+
+.section-shell {
+  @apply rounded-[24px] bg-white/70 backdrop-blur-sm shadow-veil border border-white/60;
+}
+
+.luxe-card {
+  @apply rounded-[20px] bg-white/65 backdrop-blur-sm border border-white/60 shadow-subtle transition-all duration-200 ease-gentle;
+}
+
+button {
+  transition: all 200ms ease;
+}
+
+@keyframes zip-shake {
+  0% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(2px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-zipShake {
+  animation: zip-shake 0.25s ease;
+}
+
+@keyframes check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes overlayGlow {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.stroke-check {
+  stroke: #C6A77D;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: check-draw 0.25s ease-in-out forwards;
+}
+
+.animate-overlayGlow {
+  animation: overlayGlow 0.5s ease-in-out forwards;
+}
