@@ -7,7 +7,7 @@ import { miniGridPuzzles, type MiniGridPuzzle } from "./data";
 const BASE_SCORE = 50;
 const TIME_PENALTY = 5;
 
-const MiniGridGame = ({ onSuccess, onFail, onComplete }: GameProps) => {
+const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   const puzzle = useMemo<MiniGridPuzzle>(() => miniGridPuzzles[0], []);
   const [entries, setEntries] = useState<(string | null)[][]>(
     () => puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
@@ -205,13 +205,13 @@ const MiniGridGame = ({ onSuccess, onFail, onComplete }: GameProps) => {
     if (matches) {
       setResolved(true);
       const adjustment = hintUsed ? BASE_SCORE - 1 : BASE_SCORE;
-      onComplete({ scoreDelta: adjustment, note: "Mini grid composed" });
+      onSuccess({ scoreDelta: adjustment, note: "Mini grid composed" });
     } else if (signature !== penalizedSignature) {
       setPenalizedSignature(signature);
       setMessage("Letters misaligned.");
       onFail({ note: "Mini grid unsettled", retry: true, timePenalty: TIME_PENALTY });
     }
-  }, [entries, hintUsed, onComplete, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
+  }, [entries, hintUsed, onSuccess, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
 
   const handleCellClick = (row: number, col: number) => {
     if (!puzzle.grid[row][col]) return;
