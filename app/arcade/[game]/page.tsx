@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import GameStage from "@/components/GameStage";
-import { gameMap } from "@/lib/games";
+import { allGames, gameMap } from "@/lib/games";
 import type { GameEventPayload } from "@/types/Game";
 
 type Props = {
@@ -14,6 +15,7 @@ const ArcadeGamePage = ({ params }: Props) => {
   const slug = params.game.toLowerCase();
   const selectedGame = gameMap[slug];
   const fallbackTitle = slug.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+  const router = useRouter();
 
   const [attempt, setAttempt] = useState(0);
   const [note, setNote] = useState<string | null>(null);
@@ -23,14 +25,28 @@ const ArcadeGamePage = ({ params }: Props) => {
     setTimeout(() => setAttempt((prev) => prev + 1), 600);
   }, []);
 
-  const handlers = useMemo(
-    () => ({
-      onSuccess: (payload?: GameEventPayload) => handleResult(payload, "Composed"),
-      onFail: (payload?: GameEventPayload) => handleResult(payload, "Try again"),
-      onComplete: (payload?: GameEventPayload) => handleResult(payload, "Complete")
-    }),
-    [handleResult]
-  );
+  const handlers = useMemo(() => {
+    const orderedIds = allGames.map((game) => game.id.toLowerCase());
+    const currentIndex = orderedIds.indexOf(slug);
+    const nextId = currentIndex !== -1 ? orderedIds[currentIndex + 1] : undefined;
+
+    const advanceArcade = (payload?: GameEventPayload) => {
+        setNote(payload?.note ?? "Composed");
+        setTimeout(() => {
+          if (nextId) {
+            router.push(`/arcade/${nextId}`);
+            return;
+          }
+          router.push("/arcade");
+        }, 500);
+      };
+
+    return {
+      onSuccess: advanceArcade,
+      onComplete: advanceArcade,
+      onFail: (payload?: GameEventPayload) => handleResult(payload, "Try again")
+    };
+  }, [handleResult, router, slug]);
 
   const stageBody = useMemo(() => {
     if (!selectedGame) {

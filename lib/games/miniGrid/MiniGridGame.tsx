@@ -205,13 +205,13 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
     if (matches) {
       setResolved(true);
       const adjustment = hintUsed ? BASE_SCORE - 1 : BASE_SCORE;
-      onSuccess({ scoreDelta: adjustment, note: "Mini grid composed" });
+      onComplete({ scoreDelta: adjustment, note: "Mini grid composed" });
     } else if (signature !== penalizedSignature) {
       setPenalizedSignature(signature);
       setMessage("Letters misaligned.");
       onFail({ note: "Mini grid unsettled", retry: true, timePenalty: TIME_PENALTY });
     }
-  }, [entries, hintUsed, onSuccess, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
+  }, [entries, hintUsed, onComplete, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
 
   const handleCellClick = (row: number, col: number) => {
     if (!puzzle.grid[row][col]) return;
@@ -296,7 +296,11 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
                         : isRowOrColActive
                           ? "bg-[#EADBC8]"
                           : ""
-                  } ${isLocked ? "border-[#B48C57] bg-[#E4C9A3] text-charcoal ring-1 ring-[#B48C57]" : ""}`}
+                  } ${
+                    isLocked
+                      ? "!border-[#B48C57] !bg-[#D8B680] text-charcoal ring-2 ring-[#B48C57]"
+                      : ""
+                  }`}
                 >
                   {displayValue}
                 </button>
