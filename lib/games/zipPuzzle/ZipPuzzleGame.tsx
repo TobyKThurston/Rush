@@ -46,7 +46,13 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
     }, 220);
   };
 
-  useEffect(() => () => shakeTimeoutRef.current && clearTimeout(shakeTimeoutRef.current), []);
+  useEffect(() => {
+    return () => {
+      if (shakeTimeoutRef.current) {
+        clearTimeout(shakeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const positionToCell = (event: PointerEvent, element: HTMLDivElement) => {
     const rect = element.getBoundingClientRect();

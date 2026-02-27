@@ -106,7 +106,7 @@ const buildMiniGridPuzzle = (entries: WordEntry[]): MiniGridPuzzle => {
     const tryDirection = (direction: "across" | "down") => {
       for (let letterIndex = 0; letterIndex < word.length; letterIndex += 1) {
         const letter = word[letterIndex];
-        for (const [key, existing] of grid.entries()) {
+        for (const [key, existing] of Array.from(grid.entries())) {
           if (existing !== letter) continue;
           const [rStr, cStr] = key.split(",");
           const r = Number(rStr);
@@ -153,7 +153,7 @@ const buildMiniGridPuzzle = (entries: WordEntry[]): MiniGridPuzzle => {
     if (!best) {
       let maxRow = 0;
       let maxCol = 0;
-      for (const key of grid.keys()) {
+      for (const key of Array.from(grid.keys())) {
         const [rStr, cStr] = key.split(",");
         maxRow = Math.max(maxRow, Number(rStr));
         maxCol = Math.max(maxCol, Number(cStr));
@@ -183,7 +183,7 @@ const buildMiniGridPuzzle = (entries: WordEntry[]): MiniGridPuzzle => {
   let minCol = 0;
   let maxRow = 0;
   let maxCol = 0;
-  for (const key of grid.keys()) {
+  for (const key of Array.from(grid.keys())) {
     const [rStr, cStr] = key.split(",");
     const r = Number(rStr);
     const c = Number(cStr);
@@ -197,7 +197,7 @@ const buildMiniGridPuzzle = (entries: WordEntry[]): MiniGridPuzzle => {
   const width = maxCol - minCol + 1;
   const gridArray: (string | null)[][] = Array.from({ length: height }, () => Array.from({ length: width }, () => null));
 
-  for (const [key, letter] of grid.entries()) {
+  for (const [key, letter] of Array.from(grid.entries())) {
     const [rStr, cStr] = key.split(",");
     const r = Number(rStr) - minRow;
     const c = Number(cStr) - minCol;
