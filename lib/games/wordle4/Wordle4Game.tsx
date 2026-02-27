@@ -103,8 +103,6 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
       return;
     }
 
-    onFail({ retry: true, timePenalty: 2, note: "Incorrect guess" });
-
     if (nextGuesses.length >= MAX_ATTEMPTS) {
       setResolved(true);
       onFail({ note: `Word was ${target}` });
