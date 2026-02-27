@@ -9,7 +9,10 @@ const TIME_PENALTY = 5;
 const DEBUG_MINI = process.env.NEXT_PUBLIC_RUSH_DEBUG === "1";
 
 const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
-  const puzzle = useMemo<MiniGridPuzzle>(() => miniGridPuzzles[0], []);
+  const puzzle = useMemo<MiniGridPuzzle>(
+    () => miniGridPuzzles[Math.floor(Math.random() * miniGridPuzzles.length)],
+    []
+  );
   const [entries, setEntries] = useState<(string | null)[][]>(
     () => puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
   );
@@ -287,6 +290,10 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
 
   return (
     <div className="flex h-full flex-col gap-5 text-charcoal">
+      <div className="text-center">
+        <p className="text-[10px] uppercase tracking-[0.35em] text-warmGrey">Mini Grid</p>
+        <p className="mt-2 text-xs uppercase tracking-[0.32em] text-charcoal/55">{puzzle.title} Crossword</p>
+      </div>
       <div className="grid grid-cols-2 gap-6 text-xs uppercase tracking-[0.35em] text-warmGrey">
         <ClueList
           label="Across"

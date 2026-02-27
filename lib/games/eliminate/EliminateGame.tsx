@@ -7,7 +7,10 @@ import { calculateRoundScore, createEliminateSession, TOTAL_ELIMINATE_ROUNDS } f
 const fadeDuration = 180;
 
 const EliminateGame = ({ onSuccess, onFail }: GameProps) => {
-  const puzzles = useMemo(() => createEliminateSession(TOTAL_ELIMINATE_ROUNDS, 1), []);
+  const puzzles = useMemo(() => {
+    const difficulty = (Math.floor(Math.random() * 3) + 1) as 1 | 2 | 3;
+    return createEliminateSession(TOTAL_ELIMINATE_ROUNDS, difficulty);
+  }, []);
   const [roundIndex, setRoundIndex] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
@@ -74,6 +77,9 @@ const EliminateGame = ({ onSuccess, onFail }: GameProps) => {
     <div className="flex h-full flex-col">
       <div className="mb-4 text-center">
         <p className="text-xs uppercase tracking-[0.4em] text-warmGrey">Eliminate — Round {roundIndex + 1} of {TOTAL_ELIMINATE_ROUNDS}</p>
+        <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">
+          {puzzle.mode}: {puzzle.explanation}
+        </p>
         <h3 className="mt-3 font-serif text-lg text-charcoal">Select the item that does not belong.</h3>
       </div>
       <div

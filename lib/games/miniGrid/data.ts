@@ -1,4 +1,5 @@
 export type MiniGridPuzzle = {
+  title: string;
   grid: (string | null)[][];
   words: { direction: "across" | "down"; clue: string; positions: Array<[number, number]> }[];
 };
@@ -13,12 +14,51 @@ type Placement = {
   col: number;
 };
 
-const WORD_BANK: WordEntry[] = [
-  { answer: "CAT", clue: "Small pet" },
-  { answer: "DOG", clue: "Loyal pet" },
-  { answer: "SUN", clue: "Daylight star" },
-  { answer: "MOON", clue: "Night light" },
-  { answer: "TREE", clue: "Tall plant" }
+const WORD_BANKS: Array<{ title: string; entries: WordEntry[] }> = [
+  {
+    title: "Nature",
+    entries: [
+      { answer: "CAT", clue: "Small pet" },
+      { answer: "DOG", clue: "Loyal pet" },
+      { answer: "SUN", clue: "Daylight star" },
+      { answer: "MOON", clue: "Night light" },
+      { answer: "TREE", clue: "Tall plant" },
+      { answer: "LEAF", clue: "Green blade" }
+    ]
+  },
+  {
+    title: "City Life",
+    entries: [
+      { answer: "TRAIN", clue: "Rail commuter" },
+      { answer: "ROAD", clue: "Paved route" },
+      { answer: "CAFE", clue: "Espresso spot" },
+      { answer: "TOWER", clue: "Skyline feature" },
+      { answer: "TAXI", clue: "Metered ride" },
+      { answer: "PARK", clue: "Urban greenspace" }
+    ]
+  },
+  {
+    title: "Tech",
+    entries: [
+      { answer: "CODE", clue: "What developers write" },
+      { answer: "CACHE", clue: "Fast temporary storage" },
+      { answer: "STACK", clue: "LIFO structure" },
+      { answer: "QUERY", clue: "Database request" },
+      { answer: "PIXEL", clue: "Smallest screen unit" },
+      { answer: "CLOUD", clue: "Remote compute model" }
+    ]
+  },
+  {
+    title: "Food",
+    entries: [
+      { answer: "BASIL", clue: "Green kitchen herb" },
+      { answer: "PASTA", clue: "Italian staple" },
+      { answer: "MANGO", clue: "Tropical fruit" },
+      { answer: "BREAD", clue: "Baked loaf" },
+      { answer: "OLIVE", clue: "Mediterranean fruit" },
+      { answer: "HONEY", clue: "Bee-made sweetener" }
+    ]
+  }
 ];
 
 const toKey = (row: number, col: number) => `${row},${col}`;
@@ -81,10 +121,10 @@ const placeWord = (
   }
 };
 
-const buildMiniGridPuzzle = (entries: WordEntry[]): MiniGridPuzzle => {
+const buildMiniGridPuzzle = (title: string, entries: WordEntry[]): MiniGridPuzzle => {
   const cleaned = sanitizeWords(entries).sort((a, b) => b.word.length - a.word.length);
   if (cleaned.length === 0) {
-    return { grid: [["A"]], words: [] };
+    return { title, grid: [["A"]], words: [] };
   }
 
   const grid = new Map<string, string>();
@@ -218,7 +258,9 @@ const buildMiniGridPuzzle = (entries: WordEntry[]): MiniGridPuzzle => {
     };
   });
 
-  return { grid: gridArray, words };
+  return { title, grid: gridArray, words };
 };
 
-export const miniGridPuzzles: MiniGridPuzzle[] = [buildMiniGridPuzzle(WORD_BANK)];
+export const miniGridPuzzles: MiniGridPuzzle[] = WORD_BANKS.map((bank) =>
+  buildMiniGridPuzzle(bank.title, bank.entries)
+);

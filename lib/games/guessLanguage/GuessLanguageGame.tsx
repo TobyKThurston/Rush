@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { GameProps } from "@/types/Game";
 
 type LanguageRound = {
+  family: string;
   phrase: string;
   answer: string;
   options: string[];
@@ -14,34 +15,130 @@ const POINTS_PER_ROUND = 40;
 
 const ROUND_BANK: LanguageRound[] = [
   {
+    family: "Romance",
     phrase: "Bonjour, comment allez-vous ?",
     answer: "French",
-    options: ["French", "Spanish", "Italian"]
+    options: ["French", "Spanish", "Italian", "Portuguese"]
   },
   {
+    family: "Romance",
     phrase: "¿Dónde está la estación de tren?",
     answer: "Spanish",
-    options: ["Portuguese", "Spanish", "French"]
+    options: ["Portuguese", "Spanish", "French", "Italian"]
   },
   {
+    family: "Germanic",
     phrase: "Guten Morgen, wie geht es dir?",
     answer: "German",
-    options: ["Dutch", "German", "Swedish"]
+    options: ["Dutch", "German", "Swedish", "Danish"]
   },
   {
+    family: "Romance",
     phrase: "Ciao, possiamo iniziare adesso?",
     answer: "Italian",
-    options: ["Italian", "Romanian", "Spanish"]
+    options: ["Italian", "Romanian", "Spanish", "Portuguese"]
   },
   {
+    family: "Romance",
     phrase: "Obrigada pela ajuda de hoje.",
     answer: "Portuguese",
-    options: ["Spanish", "Portuguese", "Italian"]
+    options: ["Spanish", "Portuguese", "Italian", "French"]
   },
   {
+    family: "Germanic",
     phrase: "Wat is jouw favoriete boek?",
     answer: "Dutch",
-    options: ["German", "Danish", "Dutch"]
+    options: ["German", "Danish", "Dutch", "Swedish"]
+  },
+  {
+    family: "Slavic",
+    phrase: "Dzień dobry, jak się masz?",
+    answer: "Polish",
+    options: ["Polish", "Czech", "Ukrainian", "Croatian"]
+  },
+  {
+    family: "Slavic",
+    phrase: "Добрый вечер, где находится музей?",
+    answer: "Russian",
+    options: ["Russian", "Ukrainian", "Bulgarian", "Serbian"]
+  },
+  {
+    family: "Nordic",
+    phrase: "God morgen, hva heter du?",
+    answer: "Norwegian",
+    options: ["Norwegian", "Swedish", "Danish", "Dutch"]
+  },
+  {
+    family: "Nordic",
+    phrase: "God eftermiddag, vil du have kaffe?",
+    answer: "Danish",
+    options: ["Danish", "Swedish", "Norwegian", "German"]
+  },
+  {
+    family: "Uralic",
+    phrase: "Hyvaa paivaa, missa kirjasto on?",
+    answer: "Finnish",
+    options: ["Finnish", "Hungarian", "Estonian", "Latvian"]
+  },
+  {
+    family: "Semitic",
+    phrase: "Marhaban, kayfa haluk alyawm?",
+    answer: "Arabic",
+    options: ["Arabic", "Hebrew", "Turkish", "Persian"]
+  },
+  {
+    family: "Indo-Aryan",
+    phrase: "Namaste, aap kaise hain?",
+    answer: "Hindi",
+    options: ["Hindi", "Bengali", "Urdu", "Punjabi"]
+  },
+  {
+    family: "Indo-Aryan",
+    phrase: "Assalamu alaikum, apni kemon achen?",
+    answer: "Bengali",
+    options: ["Bengali", "Hindi", "Urdu", "Gujarati"]
+  },
+  {
+    family: "Turkic",
+    phrase: "Merhaba, bugun nasilsin?",
+    answer: "Turkish",
+    options: ["Turkish", "Azerbaijani", "Arabic", "Persian"]
+  },
+  {
+    family: "East Asian",
+    phrase: "Ni hao, jintian zenmeyang?",
+    answer: "Mandarin Chinese",
+    options: ["Mandarin Chinese", "Japanese", "Korean", "Vietnamese"]
+  },
+  {
+    family: "East Asian",
+    phrase: "Annyeonghaseyo, oneul iljeongi mwoyeyo?",
+    answer: "Korean",
+    options: ["Korean", "Japanese", "Mandarin Chinese", "Thai"]
+  },
+  {
+    family: "Japonic",
+    phrase: "Ohayo gozaimasu, kyo wa naniji desu ka?",
+    answer: "Japanese",
+    options: ["Japanese", "Korean", "Mandarin Chinese", "Mongolian"]
+  },
+  {
+    family: "Austronesian",
+    phrase: "Magandang umaga, saan tayo pupunta?",
+    answer: "Tagalog",
+    options: ["Tagalog", "Malay", "Indonesian", "Vietnamese"]
+  },
+  {
+    family: "Bantu",
+    phrase: "Habari za asubuhi, unaendeleaje?",
+    answer: "Swahili",
+    options: ["Swahili", "Zulu", "Yoruba", "Amharic"]
+  },
+  {
+    family: "Celtic",
+    phrase: "Dia dhuit, conas ata tu?",
+    answer: "Irish",
+    options: ["Irish", "Welsh", "Scottish Gaelic", "English"]
   }
 ];
 
@@ -104,6 +201,7 @@ const GuessLanguageGame = ({ onSuccess, onFail }: GameProps) => {
         <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">
           Guess Language - Round {roundIndex + 1} of {TOTAL_ROUNDS}
         </p>
+        <p className="mt-2 text-[10px] uppercase tracking-[0.32em] text-charcoal/55">{currentRound.family}</p>
         <p className="mt-3 px-4 font-serif text-xl text-charcoal">{currentRound.phrase}</p>
       </div>
 

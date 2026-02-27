@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { GameProps } from "@/types/Game";
 
 type PulseResult = "Perfect" | "Great" | "Good" | "Miss";
+type PulseStyle = "Sine" | "Triangle" | "Drift";
 
 const scoreByResult: Record<PulseResult, { delta: number; note: string; success: boolean }> = {
   Perfect: { delta: 140, note: "Pulse aligned", success: true },
@@ -12,37 +13,62 @@ const scoreByResult: Record<PulseResult, { delta: number; note: string; success:
   Miss: { delta: 0, note: "Outside the calm", success: false }
 };
 
+const triangleWave = (phase: number) => {
+  const normalized = ((phase % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  const scaled = normalized / Math.PI;
+  if (scaled <= 1) return scaled;
+  return 2 - scaled;
+};
+
 const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
-  const [phase, setPhase] = useState(0);
   const [progress, setProgress] = useState(50);
   const [result, setResult] = useState<PulseResult | null>(null);
   const [awardedScore, setAwardedScore] = useState<number | null>(null);
   const rafRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
   const resolved = useRef(false);
+
   const isArcade = !status;
-  const speed = useMemo(() => (isArcade ? 0.04 + Math.random() * 0.04 : 0.12 + Math.random() * 0.1), [isArcade]);
+  const style = useMemo<PulseStyle>(() => {
+    const styles: PulseStyle[] = ["Sine", "Triangle", "Drift"];
+    return styles[Math.floor(Math.random() * styles.length)];
+  }, []);
+
+  const speed = useMemo(() => (isArcade ? 0.05 + Math.random() * 0.05 : 0.12 + Math.random() * 0.1), [isArcade]);
   const zone = useMemo(() => {
-    const width = 10 + Math.random() * 6;
-    const start = 50 - width / 2;
-    return { start, end: start + width };
+    const width = 8 + Math.random() * 10;
+    const center = 20 + Math.random() * 60;
+    const start = Math.max(4, center - width / 2);
+    const end = Math.min(96, start + width);
+    return { start, end };
   }, []);
 
   useEffect(() => {
     const animate = (timestamp: number) => {
-      setPhase((prev) => {
-        const nextPhase = prev + (speed * Math.PI * 2) / 60;
-        const normalizedPhase = nextPhase % (Math.PI * 2);
-        const position = 50 + 50 * Math.sin(normalizedPhase);
-        setProgress(position);
-        return normalizedPhase;
-      });
+      if (startRef.current === null) {
+        startRef.current = timestamp;
+      }
+      const elapsed = timestamp - startRef.current;
+      const phase = (elapsed / 1000) * speed * Math.PI * 2;
+
+      let position = 50;
+      if (style === "Sine") {
+        position = 50 + 50 * Math.sin(phase);
+      } else if (style === "Triangle") {
+        position = triangleWave(phase) * 100;
+      } else {
+        position = 50 + 38 * Math.sin(phase) + 12 * Math.sin(phase * 2.4);
+      }
+
+      setProgress(Math.max(0, Math.min(100, position)));
       rafRef.current = requestAnimationFrame(animate);
     };
+
     rafRef.current = requestAnimationFrame(animate);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [speed]);
+  }, [speed, style]);
 
   const handleTap = () => {
     if (resolved.current) return;
@@ -73,6 +99,7 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
 
   return (
     <div className="space-y-4">
+      <p className="text-center text-[10px] uppercase tracking-[0.35em] text-charcoal/55">Rhythm Style: {style}</p>
       <p className="text-center text-sm text-charcoal/70">Tap once as the pulse drifts softly through the calm band.</p>
       <button
         type="button"
@@ -99,9 +126,7 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
       {result && (
         <div className="text-center font-serif text-lg text-rosegold transition-opacity duration-300">
           {result}
-          {awardedScore !== null && (
-            <span className="ml-2 text-sm text-charcoal/60">(+{awardedScore})</span>
-          )}
+          {awardedScore !== null && <span className="ml-2 text-sm text-charcoal/60">(+{awardedScore})</span>}
         </div>
       )}
     </div>

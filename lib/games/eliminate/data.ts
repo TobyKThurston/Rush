@@ -35,6 +35,36 @@ export const eliminateCategories: EliminateCategory[] = [
     name: "Tea Varietals",
     pool: ["Sencha", "Matcha", "Oolong", "Assam", "Darjeeling", "Gyokuro"],
     intruders: ["Espresso", "Cocoa"]
+  },
+  {
+    name: "Musical Instruments",
+    pool: ["Violin", "Cello", "Flute", "Oboe", "Clarinet", "Piano", "Harp"],
+    intruders: ["Canvas", "Sculpture", "Marble"]
+  },
+  {
+    name: "Planets",
+    pool: ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Neptune"],
+    intruders: ["Pluto", "Europa", "Andromeda"]
+  },
+  {
+    name: "Programming Languages",
+    pool: ["Python", "Java", "Kotlin", "Rust", "Swift", "Go", "Ruby"],
+    intruders: ["Docker", "Kubernetes", "Postgres"]
+  },
+  {
+    name: "Sports",
+    pool: ["Tennis", "Soccer", "Baseball", "Rugby", "Cricket", "Hockey", "Volleyball"],
+    intruders: ["Opera", "Ballet", "Haiku"]
+  },
+  {
+    name: "Kitchen Spices",
+    pool: ["Cumin", "Paprika", "Turmeric", "Coriander", "Nutmeg", "Saffron", "Cinnamon"],
+    intruders: ["Basil", "Thyme", "Parsley"]
+  },
+  {
+    name: "US States",
+    pool: ["Texas", "Nevada", "Oregon", "Florida", "Georgia", "Ohio", "Alaska"],
+    intruders: ["Toronto", "Lima", "Seoul"]
   }
 ];
 
@@ -58,5 +88,35 @@ export const propertyRules: PropertyRule[] = [
     description: "Words ending with a vowel",
     correctPool: ["Aura", "Mosa", "Cameo", "Halo", "Tempo", "Solea"],
     intruderPool: ["Velvet", "Marble", "Quartz"]
+  },
+  {
+    description: "Multiples of 3",
+    correctPool: ["3", "6", "9", "12", "15", "18", "21"],
+    intruderPool: ["10", "14", "22"]
+  },
+  {
+    description: "Perfect squares",
+    correctPool: ["1", "4", "9", "16", "25", "36", "49"],
+    intruderPool: ["18", "20", "27"]
+  },
+  {
+    description: "All capitalized colors",
+    correctPool: ["Amber", "Azure", "Coral", "Ivory", "Olive", "Sienna", "Teal"],
+    intruderPool: ["Cabin", "River", "Cloud"]
+  },
+  {
+    description: "Words with double letters",
+    correctPool: ["Letter", "Coffee", "Balloon", "Address", "Ribbon", "Muffin", "Kettle"],
+    intruderPool: ["Garden", "Planet", "Winter"]
+  },
+  {
+    description: "Months with 31 days",
+    correctPool: ["January", "March", "May", "July", "August", "October", "December"],
+    intruderPool: ["April", "June", "September"]
+  },
+  {
+    description: "Words that start with ST",
+    correctPool: ["Stone", "Starlit", "Stanza", "Stitch", "Studio", "Stream", "Sturdy"],
+    intruderPool: ["Silver", "Shimmer", "Signal"]
   }
 ];

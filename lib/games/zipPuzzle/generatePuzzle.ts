@@ -26,8 +26,14 @@ const transformPoint = (point: ZipPuzzlePoint, size: number, rotation: number, m
   return mirrorPoint(rotated, size, mirror);
 };
 
-const selectTemplates = (_difficulty: ZipPuzzleDifficulty): ZipPuzzleTemplate[] => {
-  return zipPuzzleTemplates.filter((template) => template.size === 5);
+const selectTemplates = (difficulty: ZipPuzzleDifficulty): ZipPuzzleTemplate[] => {
+  if (difficulty === "calm") {
+    return zipPuzzleTemplates.filter((template) => template.size === 4 || template.size === 5);
+  }
+  if (difficulty === "bold") {
+    return zipPuzzleTemplates.filter((template) => template.size === 6);
+  }
+  return zipPuzzleTemplates.filter((template) => template.size === 5 || template.size === 6);
 };
 
 const buildAnchors = (path: ZipPuzzlePoint[], steps: number[]): ZipAnchor[] =>

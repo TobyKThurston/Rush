@@ -8,13 +8,15 @@ import {
   type PointerEvent as ReactPointerEvent
 } from "react";
 import type { GameProps } from "@/types/Game";
-import { generateZipPuzzle } from "./generatePuzzle";
+import { generateZipPuzzle, type ZipPuzzleDifficulty } from "./generatePuzzle";
 import { useZipPuzzleEngine, type ZipPuzzlePoint } from "./ZipPuzzleLogic";
 
 const keyOf = (point: ZipPuzzlePoint) => `${point.row}-${point.col}`;
+const DIFFICULTIES: ZipPuzzleDifficulty[] = ["calm", "balanced", "bold"];
 
 const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
-  const puzzle = useMemo(() => generateZipPuzzle({ difficulty: "balanced" }), []);
+  const difficulty = useMemo(() => DIFFICULTIES[Math.floor(Math.random() * DIFFICULTIES.length)], []);
+  const puzzle = useMemo(() => generateZipPuzzle({ difficulty }), [difficulty]);
   const { size, anchors, snapshot, visit, undo } = useZipPuzzleEngine(puzzle);
   const anchorMap = useMemo(() => new Map(anchors.map((anchor) => [keyOf(anchor), anchor])), [anchors]);
   const pointerRef = useRef<number | null>(null);
@@ -104,6 +106,9 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
     <div className="flex h-full flex-col gap-6">
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">Zip Puzzle</p>
+        <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">
+          {difficulty} mode • {size}x{size}
+        </p>
         <p className="mt-2 text-sm text-charcoal/70">Glide through every anchor with a single composed line.</p>
       </div>
       <div className="flex justify-center">

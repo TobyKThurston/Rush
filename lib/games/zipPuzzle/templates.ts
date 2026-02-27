@@ -116,4 +116,4 @@ const makeTemplates = (size: number): ZipPuzzleTemplate[] => {
   ];
 };
 
-export const zipPuzzleTemplates: ZipPuzzleTemplate[] = [...makeTemplates(5)];
+export const zipPuzzleTemplates: ZipPuzzleTemplate[] = [...makeTemplates(4), ...makeTemplates(5), ...makeTemplates(6)];
