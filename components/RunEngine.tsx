@@ -1,9 +1,12 @@
 "use client";
 
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { GameEventPayload, RushGame } from "@/types/Game";
 
 const DEFAULT_TIME_PENALTY = 5;
+const DEBUG_RUSH = process.env.NEXT_PUBLIC_RUSH_DEBUG === "1";
+const STORAGE_KEY = "rush:dailyRun";
 
 type RunEngineState = {
   phase: "idle" | "playing" | "finished";
@@ -40,6 +43,81 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
   const [successOverlay, setSuccessOverlay] = useState<{ finalStage: boolean } | null>(null);
   const [runFailed, setRunFailed] = useState(false);
   const pendingAdvance = useRef<{ stageIndex: number } | null>(null);
+  const advanceGuard = useRef(false);
+  const completionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const router = useRouter();
+
+  const persistProgress = useCallback(
+    (payload: {
+      phase: "idle" | "playing" | "finished";
+      sequenceIds: string[];
+      currentIndex: number;
+      score: number;
+      timeElapsed: number;
+      notes: string[];
+    }) => {
+      try {
+        if (typeof window === "undefined") return;
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      } catch {
+        // Ignore persistence errors.
+      }
+    },
+    []
+  );
+
+  const clearProgress = useCallback(() => {
+    try {
+      if (typeof window === "undefined") return;
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Ignore persistence errors.
+    }
+  }, []);
+
+  useEffect(() => {
+    if (phase !== "idle") return;
+    try {
+      if (typeof window === "undefined") return;
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as {
+        phase?: "idle" | "playing" | "finished";
+        sequenceIds?: string[];
+        currentIndex?: number;
+        score?: number;
+        timeElapsed?: number;
+        notes?: string[];
+      };
+      if (parsed.phase !== "playing" || !parsed.sequenceIds?.length) return;
+      const gameLookup = new Map(games.map((game) => [game.id, game]));
+      const restoredSequence = parsed.sequenceIds
+        .map((id) => gameLookup.get(id))
+        .filter((game): game is RushGame => Boolean(game));
+      if (restoredSequence.length === 0) return;
+
+      setSequence(restoredSequence);
+      setPhase("playing");
+      setCurrentIndex(Math.min(parsed.currentIndex ?? 0, restoredSequence.length - 1));
+      setScore(parsed.score ?? 0);
+      setTimeElapsed(parsed.timeElapsed ?? 0);
+      setNotes(parsed.notes ?? []);
+      setGameInstance((prev) => prev + 1);
+      setIsTransitioning(false);
+      setShareNote(null);
+      setRunFailed(false);
+
+      if (DEBUG_RUSH) {
+        console.log("[Rush][restore]", {
+          currentIndex: parsed.currentIndex ?? 0,
+          totalStages: restoredSequence.length,
+          timeElapsed: parsed.timeElapsed ?? 0
+        });
+      }
+    } catch {
+      // Ignore restore errors.
+    }
+  }, [phase, games]);
 
   const startRun = useCallback(() => {
     const selection: RushGame[] = [];
@@ -61,6 +139,19 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     setIsTransitioning(false);
     setShareNote(null);
     setRunFailed(false);
+    advanceGuard.current = false;
+    if (completionTimer.current) {
+      clearTimeout(completionTimer.current);
+      completionTimer.current = null;
+    }
+    persistProgress({
+      phase: "playing",
+      sequenceIds: selection.map((game) => game.id),
+      currentIndex: 0,
+      score: 0,
+      timeElapsed: 0,
+      notes: []
+    });
   }, [games, stageCount]);
 
   useEffect(() => {
@@ -76,25 +167,52 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
 
   const currentGame = phase === "playing" ? sequence[currentIndex] ?? null : null;
 
-  const finalizeStage = useCallback(
-    (stageIndexValue: number, forceFinish = false) => {
-      if (forceFinish) {
-        setPhase("finished");
-        return;
+  const advanceToNextGame = useCallback(
+    (stageIndexValue: number, source: "success" | "complete") => {
+      if (advanceGuard.current) return;
+      if (completionTimer.current) {
+        clearTimeout(completionTimer.current);
+        completionTimer.current = null;
       }
+      advanceGuard.current = true;
       setIsTransitioning(true);
-      setTimeout(() => {
+      const isFinalStage = stageIndexValue >= (stageCount || 1) - 1;
+      const nextIndex = stageIndexValue + 1;
+
+      if (DEBUG_RUSH) {
+        console.log("[Rush][advance]", {
+          source,
+          currentIndex: stageIndexValue,
+          totalStages: stageCount || 1,
+          nextIndex,
+          isFinalStage,
+          nextRoute: "/run"
+        });
+      }
+
+      completionTimer.current = setTimeout(() => {
         setIsTransitioning(false);
-        const isFinalStage = stageIndexValue >= (stageCount || 1) - 1;
         if (isFinalStage) {
           setPhase("finished");
-        } else {
-          setCurrentIndex(stageIndexValue + 1);
-          setGameInstance((prev) => prev + 1);
+          clearProgress();
+          router.replace("/run");
+          return;
         }
+        setCurrentIndex(nextIndex);
+        setGameInstance((prev) => prev + 1);
+        advanceGuard.current = false;
+        persistProgress({
+          phase: "playing",
+          sequenceIds: sequence.map((game) => game.id),
+          currentIndex: nextIndex,
+          score,
+          timeElapsed,
+          notes
+        });
+        router.replace("/run");
       }, 220);
     },
-    [stageCount]
+    [clearProgress, notes, persistProgress, router, score, sequence, stageCount, timeElapsed]
   );
 
   const resolveStage = useCallback(
@@ -117,20 +235,22 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
           return;
         }
         setRunFailed(true);
-        finalizeStage(currentIndex, true);
+        setPhase("finished");
+        clearProgress();
         return;
       }
 
       if (result === "success") {
+        if (pendingAdvance.current) return;
         pendingAdvance.current = { stageIndex: currentIndex };
         const isFinalStage = currentIndex >= (stageCount || 1) - 1;
         setSuccessOverlay({ finalStage: isFinalStage });
         return;
       }
 
-      finalizeStage(currentIndex);
+      advanceToNextGame(currentIndex, "complete");
     },
-    [phase, currentGame, currentIndex, stageCount, finalizeStage]
+    [phase, currentGame, currentIndex, stageCount, advanceToNextGame, clearProgress]
   );
 
   const handlers = useMemo(
@@ -147,10 +267,31 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     const { stageIndex } = pendingAdvance.current;
     pendingAdvance.current = null;
     setSuccessOverlay(null);
-    finalizeStage(stageIndex);
-  }, [finalizeStage]);
+    advanceToNextGame(stageIndex, "success");
+  }, [advanceToNextGame]);
 
   const formattedTime = formatTime(timeElapsed);
+
+  useEffect(() => {
+    if (phase !== "playing") return;
+    persistProgress({
+      phase,
+      sequenceIds: sequence.map((game) => game.id),
+      currentIndex,
+      score,
+      timeElapsed,
+      notes
+    });
+  }, [phase, sequence, currentIndex, score, timeElapsed, notes, persistProgress]);
+
+  useEffect(() => {
+    return () => {
+      if (completionTimer.current) {
+        clearTimeout(completionTimer.current);
+        completionTimer.current = null;
+      }
+    };
+  }, []);
 
   let stageNode: ReactNode = null;
 

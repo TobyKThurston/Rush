@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GameProps } from "@/types/Game";
 import { miniGridPuzzles, type MiniGridPuzzle } from "./data";
 
 const BASE_SCORE = 50;
 const TIME_PENALTY = 5;
+const DEBUG_MINI = process.env.NEXT_PUBLIC_RUSH_DEBUG === "1";
 
-const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
+const MiniGridGame = ({ onSuccess, onFail, onComplete }: GameProps) => {
   const puzzle = useMemo<MiniGridPuzzle>(() => miniGridPuzzles[0], []);
   const [entries, setEntries] = useState<(string | null)[][]>(
     () => puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
@@ -21,6 +22,10 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   const [message, setMessage] = useState<string | null>(null);
   const [penalizedSignature, setPenalizedSignature] = useState<string | null>(null);
   const [resolved, setResolved] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [boardLocked, setBoardLocked] = useState(false);
+  const completionGuard = useRef(false);
+  const completionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeWord = useMemo(() => puzzle.words[activeWordIndex], [puzzle.words, activeWordIndex]);
   const activePositions = activeWord.positions;
@@ -89,7 +94,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   );
 
   const handleLetter = useCallback((value: string) => {
-    if (resolved) return;
+    if (resolved || boardLocked) return;
     const char = value.toUpperCase();
     if (!/[A-Z]/.test(char)) return;
     const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
@@ -98,10 +103,10 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
     if (activeCellIndex < activePositions.length - 1) {
       moveWithinWord(1);
     }
-  }, [resolved, activePositions, activeCellIndex, moveWithinWord, setLetterAt, locked]);
+  }, [resolved, boardLocked, activePositions, activeCellIndex, moveWithinWord, setLetterAt, locked]);
 
   const handleBackspace = useCallback(() => {
-    if (resolved) return;
+    if (resolved || boardLocked) return;
     const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
     if (locked[row][col]) return;
     if (entries[row][col]) {
@@ -115,7 +120,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
         setLetterAt(prevRow, prevCol, "");
       }
     }
-  }, [resolved, activePositions, activeCellIndex, entries, moveWithinWord, setLetterAt, locked]);
+  }, [resolved, boardLocked, activePositions, activeCellIndex, entries, moveWithinWord, setLetterAt, locked]);
 
   const handleArrow = useCallback((direction: "left" | "right" | "up" | "down") => {
     const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
@@ -203,17 +208,47 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
     );
 
     if (matches) {
+      if (completionGuard.current) return;
+      completionGuard.current = true;
       setResolved(true);
+      setIsCompleted(true);
+      setBoardLocked(true);
       const adjustment = hintUsed ? BASE_SCORE - 1 : BASE_SCORE;
-      onSuccess({ scoreDelta: adjustment, note: "Mini grid composed" });
+      if (DEBUG_MINI) {
+        console.log("[MiniGrid][complete]", {
+          hintUsed,
+          scoreDelta: adjustment
+        });
+      }
+      if (completionTimer.current) {
+        clearTimeout(completionTimer.current);
+      }
+      completionTimer.current = setTimeout(() => {
+        onComplete({ scoreDelta: adjustment, note: "Mini grid composed" });
+      }, 900);
     } else if (signature !== penalizedSignature) {
       setPenalizedSignature(signature);
       setMessage("Letters misaligned.");
       onFail({ note: "Mini grid unsettled", retry: true, timePenalty: TIME_PENALTY });
     }
-  }, [entries, hintUsed, onSuccess, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
+  }, [entries, hintUsed, onComplete, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
+
+  useEffect(() => {
+    if (!DEBUG_MINI) return;
+    console.log("[MiniGrid][state]", { isCompleted, resolved, boardLocked });
+  }, [isCompleted, resolved, boardLocked]);
+
+  useEffect(() => {
+    return () => {
+      if (completionTimer.current) {
+        clearTimeout(completionTimer.current);
+        completionTimer.current = null;
+      }
+    };
+  }, []);
 
   const handleCellClick = (row: number, col: number) => {
+    if (resolved || boardLocked) return;
     if (!puzzle.grid[row][col]) return;
     const primaryIndex = puzzle.words.findIndex(
       (word) => word.direction === activeWord.direction && word.positions.some(([r, c]) => r === row && c === col)
@@ -227,7 +262,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   };
 
   const handleHint = () => {
-    if (hintUsed || resolved) return;
+    if (hintUsed || resolved || boardLocked) return;
     const targetIndex = puzzle.words.findIndex((word) =>
       word.positions.some(([row, col]) => (entries[row][col] ?? "") === "")
     );
