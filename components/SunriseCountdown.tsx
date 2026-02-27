@@ -2,20 +2,20 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const targetSunrise = () => {
+const targetReleaseTime = () => {
   const now = new Date();
-  const sunrise = new Date();
-  sunrise.setHours(6, 0, 0, 0);
-  if (sunrise <= now) {
-    sunrise.setDate(sunrise.getDate() + 1);
+  const releaseTime = new Date();
+  releaseTime.setHours(23, 59, 0, 0);
+  if (releaseTime <= now) {
+    releaseTime.setDate(releaseTime.getDate() + 1);
   }
-  return sunrise;
+  return releaseTime;
 };
 
 const getTimeUntil = () => {
   const now = new Date();
-  const sunrise = targetSunrise();
-  const diff = Math.max(0, sunrise.getTime() - now.getTime());
+  const releaseTime = targetReleaseTime();
+  const diff = Math.max(0, releaseTime.getTime() - now.getTime());
   const totalMinutes = Math.floor(diff / 60000);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
@@ -46,7 +46,7 @@ const SunriseCountdown = () => {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <p className="text-xs uppercase tracking-[0.3em] text-warmGrey/80">Resets at Sunrise</p>
+      <p className="text-xs uppercase tracking-[0.3em] text-warmGrey/80">Resets at 11:59 PM</p>
       <p className="text-xs uppercase tracking-[0.3em] text-warmGrey/60">Next run in</p>
       <div className="flex items-center gap-4 font-serif text-4xl text-[#C6A77D]/80 tracking-[0.2em]">
         <Digit value={display[0]} />

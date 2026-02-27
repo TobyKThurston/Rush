@@ -12,6 +12,9 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   const [entries, setEntries] = useState<(string | null)[][]>(
     () => puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
   );
+  const [locked, setLocked] = useState<boolean[][]>(
+    () => puzzle.grid.map((row) => row.map((cell) => Boolean(cell && false)))
+  );
   const [activeWordIndex, setActiveWordIndex] = useState(() => puzzle.words.findIndex((word) => word.direction === "across") || 0);
   const [activeCellIndex, setActiveCellIndex] = useState(0);
   const [hintUsed, setHintUsed] = useState(false);
@@ -54,34 +57,53 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
     [activePositions.length]
   );
 
-  const setLetterAt = useCallback((row: number, col: number, letter: string) => {
-    setEntries((prev) =>
-      prev.map((r, rIdx) =>
-        r.map((cell, cIdx) => {
-          if (rIdx === row && cIdx === col) {
-            return letter;
-          }
-          return cell;
-        })
-      )
-    );
-    setMessage(null);
-  }, []);
+  const setLetterAt = useCallback(
+    (row: number, col: number, letter: string) => {
+      setEntries((prev) =>
+        prev.map((r, rIdx) =>
+          r.map((cell, cIdx) => {
+            if (rIdx === row && cIdx === col) {
+              return letter;
+            }
+            return cell;
+          })
+        )
+      );
+      const expected = puzzle.grid[row][col];
+      const isCorrect = expected && letter && letter.toUpperCase() === expected;
+      setLocked((prev) =>
+        prev.map((r, rIdx) =>
+          r.map((cell, cIdx) => {
+            if (rIdx === row && cIdx === col) {
+              return Boolean(isCorrect);
+            }
+            return cell;
+          })
+        )
+      );
+      if (!isCorrect) {
+        setMessage(null);
+      }
+    },
+    [puzzle.grid]
+  );
 
   const handleLetter = useCallback((value: string) => {
     if (resolved) return;
     const char = value.toUpperCase();
     if (!/[A-Z]/.test(char)) return;
     const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
+    if (locked[row][col]) return;
     setLetterAt(row, col, char);
     if (activeCellIndex < activePositions.length - 1) {
       moveWithinWord(1);
     }
-  }, [resolved, activePositions, activeCellIndex, moveWithinWord, setLetterAt]);
+  }, [resolved, activePositions, activeCellIndex, moveWithinWord, setLetterAt, locked]);
 
   const handleBackspace = useCallback(() => {
     if (resolved) return;
     const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
+    if (locked[row][col]) return;
     if (entries[row][col]) {
       setLetterAt(row, col, "");
       return;
@@ -89,9 +111,11 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
     if (activeCellIndex > 0) {
       moveWithinWord(-1);
       const [prevRow, prevCol] = activePositions[Math.max(activeCellIndex - 1, 0)];
-      setLetterAt(prevRow, prevCol, "");
+      if (!locked[prevRow][prevCol]) {
+        setLetterAt(prevRow, prevCol, "");
+      }
     }
-  }, [resolved, activePositions, activeCellIndex, entries, moveWithinWord, setLetterAt]);
+  }, [resolved, activePositions, activeCellIndex, entries, moveWithinWord, setLetterAt, locked]);
 
   const handleArrow = useCallback((direction: "left" | "right" | "up" | "down") => {
     const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
@@ -259,6 +283,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
                 activeWord.direction === "across" ? rowIndex === activeRow : colIndex === activeCol;
               const isActiveCell = rowIndex === activeRow && colIndex === activeCol;
               const displayValue = entries[rowIndex][colIndex] ?? "";
+              const isLocked = locked[rowIndex][colIndex];
               return (
                 <button
                   key={`${rowIndex}-${colIndex}`}
@@ -271,7 +296,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
                         : isRowOrColActive
                           ? "bg-[#EADBC8]"
                           : ""
-                  }`}
+                  } ${isLocked ? "border-[#C6A77D] bg-[#F1E3D2] text-charcoal/80" : ""}`}
                 >
                   {displayValue}
                 </button>

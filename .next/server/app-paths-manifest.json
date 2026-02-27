@@ -1,6 +1,0 @@
-{
-  "/run/page": "app/run/page.js",
-  "/arcade/page": "app/arcade/page.js",
-  "/page": "app/page.js",
-  "/arcade/[game]/page": "app/arcade/[game]/page.js"
-}
