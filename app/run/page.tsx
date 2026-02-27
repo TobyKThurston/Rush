@@ -3,13 +3,13 @@
 import GameStage from "@/components/GameStage";
 import DailySuccessOverlay from "@/components/DailySuccessOverlay";
 import RunEngine from "@/components/RunEngine";
-import { allGames } from "@/lib/games";
+import { dailyGames } from "@/lib/games";
 import FixedHeader from "@/components/FixedHeader";
 import CenteredStageLayout from "@/components/CenteredStageLayout";
 
 const RunPage = () => {
   return (
-    <RunEngine games={allGames}>
+    <RunEngine games={dailyGames}>
       {({ phase, currentIndex, totalStages, timeElapsed, stageNode, successOverlay, acknowledgeSuccess }) => (
         <>
           <FixedHeader
