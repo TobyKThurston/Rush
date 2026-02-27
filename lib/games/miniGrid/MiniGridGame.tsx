@@ -296,7 +296,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
                         : isRowOrColActive
                           ? "bg-[#EADBC8]"
                           : ""
-                  } ${isLocked ? "border-[#C6A77D] bg-[#F1E3D2] text-charcoal/80" : ""}`}
+                  } ${isLocked ? "border-[#B48C57] bg-[#E4C9A3] text-charcoal ring-1 ring-[#B48C57]" : ""}`}
                 >
                   {displayValue}
                 </button>
