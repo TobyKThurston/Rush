@@ -101,8 +101,9 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     (result: "success" | "fail" | "complete", payload?: GameEventPayload) => {
       if (phase !== "playing" || !currentGame) return;
 
-      if (payload?.scoreDelta) {
-        setScore((prev) => prev + payload.scoreDelta);
+      const scoreDelta = payload?.scoreDelta;
+      if (typeof scoreDelta === "number") {
+        setScore((prev) => prev + scoreDelta);
       }
 
       if (payload?.note) {
