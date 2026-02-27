@@ -59,9 +59,10 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
-    const cellSize = rect.width / size;
-    const col = Math.min(size - 1, Math.max(0, Math.floor(x / cellSize)));
-    const row = Math.min(size - 1, Math.max(0, Math.floor(y / cellSize)));
+    const cellWidth = rect.width / size;
+    const cellHeight = rect.height / size;
+    const col = Math.min(size - 1, Math.max(0, Math.floor(x / cellWidth)));
+    const row = Math.min(size - 1, Math.max(0, Math.floor(y / cellHeight)));
     return { row, col };
   };
 
@@ -115,68 +116,72 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
         </button>
       </div>
       <div
-        ref={gridRef}
-        className="relative mx-auto w-full max-w-[500px] flex-1 select-none touch-none"
+        className="relative mx-auto aspect-square w-full max-w-[500px] select-none"
         style={{ minWidth: `${size * 48}px`, maxWidth: `${gridDimension}px` }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={releasePointer}
-        onPointerLeave={releasePointer}
-        onPointerCancel={releasePointer}
       >
         <div className="absolute inset-0 rounded-[28px] bg-ivory/80 p-4 shadow-inner">
-          {snapshot.path.length >= 2 && (
-            <svg className="pointer-events-none absolute inset-4 h-[calc(100%-32px)] w-[calc(100%-32px)]" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <polyline
-                points={polylinePoints}
-                fill="none"
-                stroke={snapshot.status === "won" ? "#C6A77D" : "rgba(198,167,125,0.6)"}
-                strokeWidth={2.6}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{ filter: snapshot.status === "won" ? "drop-shadow(0 0 6px rgba(198,167,125,0.6))" : "" }}
-              />
-            </svg>
-          )}
           <div
-            className="relative grid h-full w-full"
-            style={{
-              gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
-              gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`
-            }}
+            ref={gridRef}
+            className="relative h-full w-full touch-none"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={releasePointer}
+            onPointerLeave={releasePointer}
+            onPointerCancel={releasePointer}
           >
-            {Array.from({ length: size }).flatMap((_, row) =>
-              Array.from({ length: size }).map((__, col) => {
-                const key = `${row}-${col}`;
-                const anchor = anchorMap.get(key);
-                const isActive = key === activeKey;
-                const tone = anchor
-                  ? isActive
-                    ? "bg-rosegold/30"
-                    : "bg-white/70"
-                  : isActive
-                  ? "bg-rosegold/15"
-                  : "bg-white/60";
-                return (
-                  <div
-                    key={key}
-                    className={`m-[2px] flex items-center justify-center rounded-[16px] border border-white/60 text-charcoal shadow-sm transition-all duration-200 ease-gentle ${
-                      tone
-                    } ${isActive ? "shadow-[0_8px_20px_rgba(198,167,125,0.35)]" : ""} ${shakeKey === key ? "animate-zipShake" : ""}`}
-                  >
-                    {anchor && (
-                      <span className="font-serif text-xl text-rosegold">{anchor.value}</span>
-                    )}
-                  </div>
-                );
-              })
+            {snapshot.path.length >= 2 && (
+              <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <polyline
+                  points={polylinePoints}
+                  fill="none"
+                  stroke={snapshot.status === "won" ? "#C6A77D" : "rgba(198,167,125,0.6)"}
+                  strokeWidth={2.6}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ filter: snapshot.status === "won" ? "drop-shadow(0 0 6px rgba(198,167,125,0.6))" : "" }}
+                />
+              </svg>
+            )}
+            <div
+              className="relative grid h-full w-full"
+              style={{
+                gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
+                gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`
+              }}
+            >
+              {Array.from({ length: size }).flatMap((_, row) =>
+                Array.from({ length: size }).map((__, col) => {
+                  const key = `${row}-${col}`;
+                  const anchor = anchorMap.get(key);
+                  const isActive = key === activeKey;
+                  const tone = anchor
+                    ? isActive
+                      ? "bg-rosegold/30"
+                      : "bg-white/70"
+                    : isActive
+                    ? "bg-rosegold/15"
+                    : "bg-white/60";
+                  return (
+                    <div
+                      key={key}
+                      className={`m-[2px] flex items-center justify-center rounded-[16px] border border-white/60 text-charcoal shadow-sm transition-all duration-200 ease-gentle ${
+                        tone
+                      } ${isActive ? "shadow-[0_8px_20px_rgba(198,167,125,0.35)]" : ""} ${shakeKey === key ? "animate-zipShake" : ""}`}
+                    >
+                      {anchor && (
+                        <span className="font-serif text-xl text-rosegold">{anchor.value}</span>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+            {snapshot.status === "won" && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-[24px] bg-gradient-to-br from-white/30 to-rosegold/20 text-center text-sm font-medium text-charcoal/80">
+                Sequence complete
+              </div>
             )}
           </div>
-          {snapshot.status === "won" && (
-            <div className="pointer-events-none absolute inset-4 flex items-center justify-center rounded-[24px] bg-gradient-to-br from-white/30 to-rosegold/20 text-center text-sm font-medium text-charcoal/80">
-              Sequence complete
-            </div>
-          )}
         </div>
       </div>
     </div>
