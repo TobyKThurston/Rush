@@ -7,7 +7,7 @@ import { miniGridPuzzles, type MiniGridPuzzle } from "./data";
 const BASE_SCORE = 50;
 const TIME_PENALTY = 5;
 
-const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
+const MiniGridGame = ({ onSuccess, onFail, onComplete }: GameProps) => {
   const puzzle = useMemo<MiniGridPuzzle>(() => miniGridPuzzles[0], []);
   const [entries, setEntries] = useState<(string | null)[][]>(
     () => puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
