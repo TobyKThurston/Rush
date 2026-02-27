@@ -133,11 +133,13 @@ const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
         </p>
         <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">{currentRound.mode}</p>
         <p className="mt-2 text-xs uppercase tracking-[0.28em] text-charcoal/65">{currentRound.difficulty}</p>
-        <p className="mt-3 font-serif text-2xl text-charcoal">
-          {currentRound.sequence
-            .map((value, index) => (index === currentRound.missingIndex ? "?" : value.toString()))
-            .join("   ")}
-        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-5 font-serif text-2xl text-charcoal">
+          {currentRound.sequence.map((value, index) => (
+            <span key={`${currentRound.mode}-${index}`} className="min-w-[2ch] text-center">
+              {index === currentRound.missingIndex ? "?" : value.toString()}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="mx-auto grid w-full max-w-md gap-3">
