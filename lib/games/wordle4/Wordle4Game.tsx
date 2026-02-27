@@ -12,7 +12,7 @@ type WordBank = {
 };
 
 const WORD_LENGTH = 4;
-const MAX_ATTEMPTS = 6;
+const MAX_ATTEMPTS = 5;
 const KEYBOARD_ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 
 const WORD_BANKS: WordBank[] = [
@@ -144,13 +144,12 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
 
   return (
     <div className="flex h-full flex-col justify-center">
-      <div className="mb-3 text-center">
+      <div className="mb-2 text-center">
         <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">Wordle 4</p>
-        <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">Theme: {pack.theme}</p>
-        <p className="mt-2 text-xs text-charcoal/70">{message}</p>
+        <p className="mt-1 text-xs text-charcoal/70">{message}</p>
       </div>
 
-      <div className="mx-auto grid w-full max-w-[300px] gap-1.5">
+      <div className="mx-auto grid w-full max-w-[270px] gap-1">
         {Array.from({ length: MAX_ATTEMPTS }).map((_, row) => {
           const guess = guesses[row] ?? "";
           const isCurrent = row === guesses.length && !resolved;
@@ -158,14 +157,14 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
           const evaluation = evaluations[row];
 
           return (
-            <div key={`row-${row}`} className="grid grid-cols-4 gap-1.5">
+            <div key={`row-${row}`} className="grid grid-cols-4 gap-1">
               {Array.from({ length: WORD_LENGTH }).map((__, col) => {
                 const letter = display[col] ?? "";
                 const state = guess ? evaluation?.[col] : undefined;
                 return (
                   <div
                     key={`cell-${row}-${col}`}
-                    className={`flex aspect-square items-center justify-center rounded-[10px] border font-serif text-lg ${cellTone(state)}`}
+                    className={`flex aspect-square items-center justify-center rounded-[8px] border font-serif text-base ${cellTone(state)}`}
                   >
                     {letter}
                   </div>
@@ -176,7 +175,7 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
         })}
       </div>
 
-      <div className="mx-auto mt-3 w-full max-w-[330px] space-y-1.5">
+      <div className="mx-auto mt-2.5 w-full max-w-[300px] space-y-1">
         {KEYBOARD_ROWS.map((row) => (
           <div key={row} className="flex justify-center gap-1">
             {row.split("").map((letter) => (
@@ -184,7 +183,7 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
                 key={letter}
                 type="button"
                 onClick={() => keyPress(letter)}
-                className="rounded-[9px] border border-white/70 bg-white/65 px-2 py-1.5 text-[10px] font-semibold text-charcoal transition-colors hover:border-rosegold/60"
+                className="rounded-[8px] border border-white/70 bg-white/65 px-1.5 py-1 text-[9px] font-semibold text-charcoal transition-colors hover:border-rosegold/60"
               >
                 {letter}
               </button>
@@ -195,14 +194,14 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
           <button
             type="button"
             onClick={() => keyPress("ENTER")}
-            className="rounded-[9px] border border-white/70 bg-white/70 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-charcoal hover:border-rosegold/60"
+            className="rounded-[8px] border border-[#6A9F6E]/60 bg-[#DDEEDC] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-charcoal hover:border-[#6A9F6E]"
           >
             Enter
           </button>
           <button
             type="button"
             onClick={() => keyPress("BACK")}
-            className="rounded-[9px] border border-white/70 bg-white/70 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-charcoal hover:border-rosegold/60"
+            className="rounded-[8px] border border-white/70 bg-white/70 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-charcoal hover:border-rosegold/60"
           >
             Back
           </button>
