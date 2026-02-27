@@ -4,146 +4,129 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { GameProps } from "@/types/Game";
 import { miniGridPuzzles, type MiniGridPuzzle } from "./data";
 
-const baseScore = 100;
+const BASE_SCORE = 50;
+const TIME_PENALTY = 5;
 
 const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   const puzzle = useMemo<MiniGridPuzzle>(() => miniGridPuzzles[0], []);
-  const [values, setValues] = useState(() =>
-    puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
+  const [entries, setEntries] = useState<(string | null)[][]>(
+    () => puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
   );
-  const [activeWordIndex, setActiveWordIndex] = useState(0);
+  const [activeWordIndex, setActiveWordIndex] = useState(() => puzzle.words.findIndex((word) => word.direction === "across") || 0);
   const [activeCellIndex, setActiveCellIndex] = useState(0);
   const [hintUsed, setHintUsed] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [penalizedSignature, setPenalizedSignature] = useState<string | null>(null);
   const [resolved, setResolved] = useState(false);
 
-  const activeWord = puzzle.words[activeWordIndex];
-  const [activeRow, activeCol] = activeWord.positions[activeCellIndex];
+  const activeWord = useMemo(() => puzzle.words[activeWordIndex], [puzzle.words, activeWordIndex]);
+  const activePositions = activeWord.positions;
+  const [activeRow, activeCol] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
+
+  const signature = entries
+    .map((row) =>
+      row
+        .map((cell) => {
+          if (cell === null) return "#";
+          return cell === "" ? "_" : cell;
+        })
+        .join("")
+    )
+    .join("|");
 
   const selectWord = useCallback(
     (wordIndex: number, cellIndex = 0) => {
+      const word = puzzle.words[wordIndex];
+      const nextIndex = word.positions.findIndex(([row, col]) => (entries[row][col] ?? "") === "");
       setActiveWordIndex(wordIndex);
-      setActiveCellIndex(cellIndex);
+      setActiveCellIndex(nextIndex === -1 ? cellIndex : nextIndex);
     },
-    []
+    [entries, puzzle.words]
   );
 
   const moveWithinWord = useCallback(
     (delta: -1 | 1) => {
       setActiveCellIndex((prev) => {
-        const next = Math.min(Math.max(prev + delta, 0), activeWord.positions.length - 1);
-        return next;
+        const target = Math.min(Math.max(prev + delta, 0), activePositions.length - 1);
+        return target;
       });
     },
-    [activeWord.positions.length]
+    [activePositions.length]
   );
 
-  const setLetterAt = useCallback(
-    (row: number, col: number, letter: string) => {
-      setValues((prev) =>
-        prev.map((r, rIndex) =>
-          r.map((cell, cIndex) => {
-            if (rIndex === row && cIndex === col) {
-              return letter;
-            }
-            return cell;
-          })
-        )
-      );
-      setMessage(null);
-    },
-    []
-  );
-
-  const checkCompletion = useCallback(
-    (state: (string | null)[][]) => {
-      const hasEmpty = state.some((row) => row.some((cell) => cell === ""));
-      if (hasEmpty) return;
-      const matches = state.every((row, rIdx) =>
-        row.every((cell, cIdx) => {
-          if (cell === null) return true;
-          return cell?.toUpperCase() === puzzle.grid[rIdx][cIdx];
+  const setLetterAt = useCallback((row: number, col: number, letter: string) => {
+    setEntries((prev) =>
+      prev.map((r, rIdx) =>
+        r.map((cell, cIdx) => {
+          if (rIdx === row && cIdx === col) {
+            return letter;
+          }
+          return cell;
         })
-      );
-      if (matches) {
-        if (!resolved) {
-          setResolved(true);
-          const adjustment = hintUsed ? baseScore - 1 : baseScore;
-          onSuccess({ scoreDelta: adjustment, note: "Mini grid composed" });
-        }
-      } else {
-        setMessage("Letters misaligned.");
-        onFail({ note: "Mini grid unsettled", retry: true, timePenalty: 5 });
-      }
-    },
-    [puzzle.grid, onSuccess, onFail, hintUsed, resolved]
-  );
+      )
+    );
+    setMessage(null);
+  }, []);
 
-  useEffect(() => {
-    checkCompletion(values);
-  }, [values, checkCompletion]);
-
-  const handleLetter = useCallback(
-    (letter: string) => {
-      if (resolved) return;
-      const char = letter.toUpperCase();
-      if (!/[A-Z]/.test(char)) return;
-      const [row, col] = activeWord.positions[activeCellIndex];
-      setLetterAt(row, col, char);
-      if (activeCellIndex < activeWord.positions.length - 1) {
-        moveWithinWord(1);
-      }
-    },
-    [activeWord.positions, activeCellIndex, moveWithinWord, setLetterAt, resolved]
-  );
+  const handleLetter = useCallback((value: string) => {
+    if (resolved) return;
+    const char = value.toUpperCase();
+    if (!/[A-Z]/.test(char)) return;
+    const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
+    setLetterAt(row, col, char);
+    if (activeCellIndex < activePositions.length - 1) {
+      moveWithinWord(1);
+    }
+  }, [resolved, activePositions, activeCellIndex, moveWithinWord, setLetterAt]);
 
   const handleBackspace = useCallback(() => {
     if (resolved) return;
-    const [row, col] = activeWord.positions[activeCellIndex];
-    if (values[row][col]) {
+    const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
+    if (entries[row][col]) {
       setLetterAt(row, col, "");
       return;
     }
     if (activeCellIndex > 0) {
       moveWithinWord(-1);
-      const [prevRow, prevCol] = activeWord.positions[activeCellIndex - 1];
+      const [prevRow, prevCol] = activePositions[Math.max(activeCellIndex - 1, 0)];
       setLetterAt(prevRow, prevCol, "");
     }
-  }, [activeCellIndex, activeWord.positions, moveWithinWord, setLetterAt, values, resolved]);
+  }, [resolved, activePositions, activeCellIndex, entries, moveWithinWord, setLetterAt]);
 
-  const handleArrow = useCallback(
-    (direction: "left" | "right" | "up" | "down") => {
-      const [row, col] = activeWord.positions[activeCellIndex];
-      let nextRow = row;
-      let nextCol = col;
-      const delta = direction === "left" ? [0, -1] : direction === "right" ? [0, 1] : direction === "up" ? [-1, 0] : [1, 0];
-      while (true) {
-        nextRow += delta[0];
-        nextCol += delta[1];
-        if (nextRow < 0 || nextCol < 0 || nextRow >= values.length || nextCol >= values[0].length) return;
-        if (puzzle.grid[nextRow][nextCol]) {
-          const preferredDirection = delta[0] !== 0 ? "down" : "across";
-          const targetIndex = puzzle.words.findIndex((word) =>
-            word.direction === preferredDirection && word.positions.some(([r, c]) => r === nextRow && c === nextCol)
-          );
-          const fallbackIndex = puzzle.words.findIndex((word) =>
-            word.positions.some(([r, c]) => r === nextRow && c === nextCol)
-          );
-          const wordIndex = targetIndex !== -1 ? targetIndex : fallbackIndex;
-          if (wordIndex !== -1) {
-            const word = puzzle.words[wordIndex];
-            const cellIndex = word.positions.findIndex(([r, c]) => r === nextRow && c === nextCol);
-            selectWord(wordIndex, cellIndex);
-          }
-          return;
+  const handleArrow = useCallback((direction: "left" | "right" | "up" | "down") => {
+    const [row, col] = activePositions[Math.min(activeCellIndex, activePositions.length - 1)];
+    const deltas: Record<typeof direction, [number, number]> = {
+      left: [0, -1],
+      right: [0, 1],
+      up: [-1, 0],
+      down: [1, 0]
+    };
+    const [dRow, dCol] = deltas[direction];
+    let nextRow = row;
+    let nextCol = col;
+
+    while (true) {
+      nextRow += dRow;
+      nextCol += dCol;
+      if (nextRow < 0 || nextCol < 0 || nextRow >= puzzle.grid.length || nextCol >= puzzle.grid[0].length) return;
+      if (puzzle.grid[nextRow][nextCol]) {
+        const preferredDirection = dRow !== 0 ? "down" : "across";
+        const targetIndex = puzzle.words.findIndex((word) =>
+          word.direction === preferredDirection && word.positions.some(([r, c]) => r === nextRow && c === nextCol)
+        );
+        const fallbackIndex = puzzle.words.findIndex((word) => word.positions.some(([r, c]) => r === nextRow && c === nextCol));
+        const wordIndex = targetIndex !== -1 ? targetIndex : fallbackIndex;
+        if (wordIndex !== -1) {
+          const cellIndex = puzzle.words[wordIndex].positions.findIndex(([r, c]) => r === nextRow && c === nextCol);
+          selectWord(wordIndex, cellIndex);
         }
+        return;
       }
-    },
-    [activeWord.positions, activeCellIndex, puzzle.words, puzzle.grid, selectWord, values]
-  );
+    }
+  }, [activePositions, activeCellIndex, puzzle.grid, puzzle.words, selectWord]);
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Backspace") {
         event.preventDefault();
         handleBackspace();
@@ -173,22 +156,46 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
         event.preventDefault();
         handleLetter(event.key);
       }
-    },
-    [handleBackspace, handleArrow, handleLetter]
-  );
-
-  useEffect(() => {
+    };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+  }, [handleBackspace, handleArrow, handleLetter]);
+
+  useEffect(() => {
+    if (resolved) return;
+    const hasEmpty = entries.some((row) => row.some((cell) => cell === ""));
+    if (hasEmpty) {
+      setPenalizedSignature(null);
+      setMessage(null);
+      return;
+    }
+
+    const matches = entries.every((row, rIdx) =>
+      row.every((cell, cIdx) => {
+        if (cell === null) return true;
+        const expected = puzzle.grid[rIdx][cIdx];
+        return cell?.toUpperCase() === expected;
+      })
+    );
+
+    if (matches) {
+      setResolved(true);
+      const adjustment = hintUsed ? BASE_SCORE - 1 : BASE_SCORE;
+      onSuccess({ scoreDelta: adjustment, note: "Mini grid composed" });
+    } else if (signature !== penalizedSignature) {
+      setPenalizedSignature(signature);
+      setMessage("Letters misaligned.");
+      onFail({ note: "Mini grid unsettled", retry: true, timePenalty: TIME_PENALTY });
+    }
+  }, [entries, hintUsed, onSuccess, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
 
   const handleCellClick = (row: number, col: number) => {
     if (!puzzle.grid[row][col]) return;
-    const wordIndex = puzzle.words.findIndex((word) =>
-      word.positions.some(([r, c]) => r === row && c === col && word.direction === activeWord.direction)
+    const primaryIndex = puzzle.words.findIndex(
+      (word) => word.direction === activeWord.direction && word.positions.some(([r, c]) => r === row && c === col)
     );
-    const fallback = puzzle.words.findIndex((word) => word.positions.some(([r, c]) => r === row && c === col));
-    const targetIndex = wordIndex !== -1 ? wordIndex : fallback;
+    const fallbackIndex = puzzle.words.findIndex((word) => word.positions.some(([r, c]) => r === row && c === col));
+    const targetIndex = primaryIndex !== -1 ? primaryIndex : fallbackIndex;
     if (targetIndex !== -1) {
       const cellIndex = puzzle.words[targetIndex].positions.findIndex(([r, c]) => r === row && c === col);
       selectWord(targetIndex, cellIndex);
@@ -197,16 +204,16 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
 
   const handleHint = () => {
     if (hintUsed || resolved) return;
-    const targetIndex = puzzle.words.findIndex((word, index) =>
-      word.positions.some(([row, col]) => (values[row][col] ?? "") === "") && index >= 0
+    const targetIndex = puzzle.words.findIndex((word) =>
+      word.positions.some(([row, col]) => (entries[row][col] ?? "") === "")
     );
     const wordIndex = targetIndex === -1 ? 0 : targetIndex;
     const word = puzzle.words[wordIndex];
-    setValues((prev) =>
+    setEntries((prev) =>
       prev.map((row, rIdx) =>
         row.map((cell, cIdx) => {
-          const match = word.positions.some(([r, c]) => r === rIdx && c === cIdx);
-          if (match) {
+          const shouldFill = word.positions.some(([r, c]) => r === rIdx && c === cIdx);
+          if (shouldFill) {
             return puzzle.grid[rIdx][cIdx] ?? "";
           }
           return cell;
@@ -214,13 +221,14 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
       )
     );
     setHintUsed(true);
-    selectWord(wordIndex, word.positions.length - 1);
     setMessage("Lift granted.");
+    setPenalizedSignature(null);
+    selectWord(wordIndex, word.positions.length - 1);
   };
 
   return (
-    <div className="flex h-full flex-col gap-6 text-charcoal">
-      <div className="grid grid-cols-2 gap-6 text-xs uppercase tracking-[0.3em] text-warmGrey">
+    <div className="flex h-full flex-col gap-5 text-charcoal">
+      <div className="grid grid-cols-2 gap-6 text-xs uppercase tracking-[0.35em] text-warmGrey">
         <ClueList
           label="Across"
           words={puzzle.words}
@@ -243,19 +251,26 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
         >
           {puzzle.grid.map((row, rowIndex) =>
             row.map((cell, colIndex) => {
-              const isEditable = !!cell;
-              const isActiveWordCell = activeWord.positions.some(([r, c]) => r === rowIndex && c === colIndex);
-              const isActiveCell = rowIndex === activeRow && colIndex === activeCol;
-              const displayValue = values[rowIndex][colIndex] ?? "";
-              if (!isEditable) {
+              if (!cell) {
                 return <div key={`${rowIndex}-${colIndex}`} className="h-12 w-12 rounded-[12px] bg-transparent" />;
               }
+              const isWordCell = activeWord.positions.some(([r, c]) => r === rowIndex && c === colIndex);
+              const isRowOrColActive =
+                activeWord.direction === "across" ? rowIndex === activeRow : colIndex === activeCol;
+              const isActiveCell = rowIndex === activeRow && colIndex === activeCol;
+              const displayValue = entries[rowIndex][colIndex] ?? "";
               return (
                 <button
                   key={`${rowIndex}-${colIndex}`}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
-                  className={`flex h-12 w-12 items-center justify-center rounded-[12px] border border-white/60 bg-white/80 font-serif text-xl text-charcoal shadow-subtle transition-all duration-200 ${
-                    isActiveCell ? "ring-2 ring-[#C6A77D]" : isActiveWordCell ? "bg-[#F8F3ED]" : ""
+                  className={`flex h-12 w-12 items-center justify-center rounded-[12px] border border-white/60 bg-white/80 font-serif text-xl text-charcoal shadow-subtle transition-all duration-200 ease-gentle hover:-translate-y-0.5 ${
+                    isActiveCell
+                      ? "ring-2 ring-[#C6A77D]"
+                      : isWordCell
+                        ? "bg-[#F8F3ED]"
+                        : isRowOrColActive
+                          ? "bg-[#EADBC8]"
+                          : ""
                   }`}
                 >
                   {displayValue}
@@ -295,7 +310,7 @@ const ClueList = ({
   return (
     <div className="space-y-2">
       <p className="text-[10px] uppercase tracking-[0.5em] text-warmGrey/80">{label}</p>
-      <ul className="space-y-2 text-charcoal/80">
+      <ul className="space-y-2 text-charcoal">
         {words
           .map((word, index) => ({ ...word, index }))
           .filter((word) => word.direction === direction)
@@ -303,8 +318,8 @@ const ClueList = ({
             <li key={word.index}>
               <button
                 onClick={() => onSelect(word.index)}
-                className={`text-left font-serif text-sm transition-colors duration-150 ${
-                  word.index === activeWordIndex ? "text-charcoal" : "text-charcoal/60"
+                className={`font-serif text-sm transition-colors duration-150 ${
+                  word.index === activeWordIndex ? "text-charcoal" : "text-charcoal/50"
                 }`}
               >
                 {word.clue}

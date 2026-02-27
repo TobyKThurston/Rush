@@ -47,7 +47,7 @@ const SunriseCountdown = () => {
   return (
     <div className="flex flex-col items-center gap-3">
       <p className="text-xs uppercase tracking-[0.3em] text-warmGrey/80">Resets at Sunrise</p>
-      <p className="text-xs uppercase tracking-[0.3em] text-warmGrey/60">Next ritual in</p>
+      <p className="text-xs uppercase tracking-[0.3em] text-warmGrey/60">Next run in</p>
       <div className="flex items-center gap-4 font-serif text-4xl text-[#C6A77D]/80 tracking-[0.2em]">
         <Digit value={display[0]} />
         <Colon active={colonActive} />

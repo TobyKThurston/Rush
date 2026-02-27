@@ -7,5 +7,5 @@ import { zipPuzzleGame } from "./zipPuzzle";
 export const allGames: RushGame[] = [eliminateGame, miniGridGame, timingGame, zipPuzzleGame];
 
 export const gameMap: Record<string, RushGame> = Object.fromEntries(
-  allGames.map((game) => [game.id, game])
+  allGames.map((game) => [game.id.toLowerCase(), game])
 ) as Record<string, RushGame>;

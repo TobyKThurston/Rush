@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GameEventPayload, RushGame } from "@/types/Game";
 
