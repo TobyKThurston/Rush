@@ -70,6 +70,13 @@ const cellTone = (state?: LetterState): string => {
   return "border-white/70 bg-white/70 text-charcoal";
 };
 
+const keyboardTone = (state?: LetterState): string => {
+  if (state === "correct") return "border-[#6A9F6E]/70 bg-[#DDEEDC]";
+  if (state === "present") return "border-[#C9A94C]/70 bg-[#F6EDCE]";
+  if (state === "absent") return "border-white/60 bg-[#E9E6DE] text-charcoal/70";
+  return "border-white/70 bg-white/65";
+};
+
 const scoreForAttempt = (attempt: number) => Math.max(60, 140 - attempt * 12);
 
 const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
@@ -82,6 +89,27 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
   const [resolved, setResolved] = useState(false);
 
   const evaluations = useMemo(() => guesses.map((guess) => evaluateGuess(guess, target)), [guesses, target]);
+  const keyboardStates = useMemo(() => {
+    const states: Partial<Record<string, LetterState>> = {};
+    guesses.forEach((guess, guessIndex) => {
+      const evalRow = evaluations[guessIndex];
+      if (!evalRow) return;
+      guess.split("").forEach((letter, letterIndex) => {
+        const nextState = evalRow[letterIndex];
+        const prevState = states[letter];
+        if (nextState === "correct" || prevState === "correct") {
+          states[letter] = "correct";
+          return;
+        }
+        if (nextState === "present" || prevState === "present") {
+          states[letter] = "present";
+          return;
+        }
+        states[letter] = "absent";
+      });
+    });
+    return states;
+  }, [guesses, evaluations]);
   const attemptIndex = guesses.length;
 
   const submitGuess = () => {
@@ -175,7 +203,7 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
                 key={letter}
                 type="button"
                 onClick={() => keyPress(letter)}
-                className="rounded-[8px] border border-white/70 bg-white/65 px-1.5 py-1 text-[9px] font-semibold text-charcoal transition-colors hover:border-rosegold/60"
+                className={`rounded-[8px] border px-1.5 py-1 text-[9px] font-semibold text-charcoal transition-colors hover:border-rosegold/60 ${keyboardTone(keyboardStates[letter])}`}
               >
                 {letter}
               </button>
