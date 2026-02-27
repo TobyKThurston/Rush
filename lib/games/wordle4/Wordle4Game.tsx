@@ -75,7 +75,6 @@ const scoreForAttempt = (attempt: number) => Math.max(60, 140 - attempt * 12);
 const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
   const pack = useMemo(() => WORD_BANKS[Math.floor(Math.random() * WORD_BANKS.length)], []);
   const target = useMemo(() => pack.targets[Math.floor(Math.random() * pack.targets.length)], [pack]);
-  const validWords = useMemo(() => new Set([...pack.targets, ...pack.extras]), [pack]);
 
   const [guesses, setGuesses] = useState<string[]>([]);
   const [current, setCurrent] = useState("");
@@ -91,11 +90,6 @@ const Wordle4Game = ({ onSuccess, onFail }: GameProps) => {
       setMessage(`Enter ${WORD_LENGTH} letters.`);
       return;
     }
-    if (!validWords.has(current)) {
-      setMessage("Word not in this theme list.");
-      return;
-    }
-
     const nextGuesses = [...guesses, current];
     setGuesses(nextGuesses);
     setCurrent("");
