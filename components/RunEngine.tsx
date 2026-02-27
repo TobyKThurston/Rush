@@ -3,10 +3,30 @@
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GameEventPayload, RushGame } from "@/types/Game";
+import SunriseCountdown from "./SunriseCountdown";
 
 const DEFAULT_TIME_PENALTY = 5;
 const DEBUG_RUSH = process.env.NEXT_PUBLIC_RUSH_DEBUG === "1";
 const STORAGE_KEY = "rush:dailyRun";
+const DAILY_META_KEY = "rush:dailyMeta";
+
+const getDailyResetTime = (now: Date) => {
+  const reset = new Date(now);
+  reset.setHours(23, 59, 0, 0);
+  return reset;
+};
+
+const getDailyWindowKey = (now: Date = new Date()) => {
+  const reset = getDailyResetTime(now);
+  const windowDate = new Date(reset);
+  if (now < reset) {
+    windowDate.setDate(windowDate.getDate() - 1);
+  }
+  const year = windowDate.getFullYear();
+  const month = `${windowDate.getMonth() + 1}`.padStart(2, "0");
+  const day = `${windowDate.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 type RunEngineState = {
   phase: "idle" | "playing" | "finished";
@@ -42,6 +62,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
   const [shareNote, setShareNote] = useState<string | null>(null);
   const [successOverlay, setSuccessOverlay] = useState<{ finalStage: boolean } | null>(null);
   const [runFailed, setRunFailed] = useState(false);
+  const [dailyLocked, setDailyLocked] = useState(false);
   const pendingAdvance = useRef<{ stageIndex: number } | null>(null);
   const advanceGuard = useRef(false);
   const completionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -74,6 +95,40 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       // Ignore persistence errors.
     }
   }, []);
+
+  const refreshDailyLock = useCallback(() => {
+    try {
+      if (typeof window === "undefined") return;
+      const raw = window.localStorage.getItem(DAILY_META_KEY);
+      if (!raw) {
+        setDailyLocked(false);
+        return;
+      }
+      const parsed = JSON.parse(raw) as { lastCompletedWindowKey?: string };
+      setDailyLocked(parsed.lastCompletedWindowKey === getDailyWindowKey());
+    } catch {
+      setDailyLocked(false);
+    }
+  }, []);
+
+  const lockTodayRun = useCallback(() => {
+    try {
+      if (typeof window === "undefined") return;
+      window.localStorage.setItem(
+        DAILY_META_KEY,
+        JSON.stringify({ lastCompletedWindowKey: getDailyWindowKey() })
+      );
+      setDailyLocked(true);
+    } catch {
+      // Ignore persistence errors.
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshDailyLock();
+    const timer = setInterval(refreshDailyLock, 30000);
+    return () => clearInterval(timer);
+  }, [refreshDailyLock]);
 
   useEffect(() => {
     if (phase !== "idle") return;
@@ -120,6 +175,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
   }, [phase, games]);
 
   const startRun = useCallback(() => {
+    if (dailyLocked) return;
     const selection: RushGame[] = [];
     const shuffled = [...games];
     for (let i = 0; i < (stageCount || 1); i += 1) {
@@ -152,7 +208,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       timeElapsed: 0,
       notes: []
     });
-  }, [games, stageCount]);
+  }, [games, stageCount, dailyLocked, persistProgress]);
 
   useEffect(() => {
     if (phase !== "playing") return;
@@ -194,6 +250,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         setIsTransitioning(false);
         if (isFinalStage) {
           setPhase("finished");
+          lockTodayRun();
           clearProgress();
           router.replace("/run");
           return;
@@ -212,7 +269,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         router.replace("/run");
       }, 220);
     },
-    [clearProgress, notes, persistProgress, router, score, sequence, stageCount, timeElapsed]
+    [clearProgress, lockTodayRun, notes, persistProgress, router, score, sequence, stageCount, timeElapsed]
   );
 
   const resolveStage = useCallback(
@@ -236,6 +293,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         }
         setRunFailed(true);
         setPhase("finished");
+        lockTodayRun();
         clearProgress();
         return;
       }
@@ -250,7 +308,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
 
       advanceToNextGame(currentIndex, "complete");
     },
-    [phase, currentGame, currentIndex, stageCount, advanceToNextGame, clearProgress]
+    [phase, currentGame, currentIndex, stageCount, advanceToNextGame, clearProgress, lockTodayRun]
   );
 
   const handlers = useMemo(
@@ -299,14 +357,20 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     stageNode = (
       <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
         <p className="text-sm text-charcoal/70">
-          Today&apos;s run features composed decisions. Preserve calm, react with precision.
+          {dailyLocked
+            ? "Daily run is complete. A new run unlocks at 11:59 PM."
+            : "Today&apos;s run features composed decisions. Preserve calm, react with precision."}
         </p>
-        <button
-          onClick={startRun}
-          className="rounded-full border border-charcoal/10 bg-charcoal px-10 py-3 text-xs uppercase tracking-[0.35em] text-ivory hover:bg-charcoal/90"
-        >
-          Begin Run
-        </button>
+        {dailyLocked ? (
+          <SunriseCountdown />
+        ) : (
+          <button
+            onClick={startRun}
+            className="rounded-full border border-charcoal/10 bg-charcoal px-10 py-3 text-xs uppercase tracking-[0.35em] text-ivory hover:bg-charcoal/90"
+          >
+            Begin Run
+          </button>
+        )}
       </div>
     );
   } else if (phase === "finished") {
@@ -317,7 +381,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
           <p className="font-serif text-5xl text-charcoal">{formattedTime}</p>
         </div>
         <p className="text-sm text-charcoal/70">
-          {runFailed ? "Run interrupted. Begin anew." : "Daily run complete."}
+          {runFailed ? "Run interrupted." : "Daily run complete."}
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           {!runFailed && (
@@ -341,12 +405,18 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
               Share Result
             </button>
           )}
-          <button
-            onClick={startRun}
-            className="rounded-full border border-charcoal/20 bg-white/70 px-8 py-3 text-xs uppercase tracking-[0.3em] text-charcoal transition hover:bg-white"
-          >
-            Restart Run
-          </button>
+          {dailyLocked ? (
+            <div className="rounded-[20px] border border-white/70 bg-white/60 px-6 py-4">
+              <SunriseCountdown />
+            </div>
+          ) : (
+            <button
+              onClick={startRun}
+              className="rounded-full border border-charcoal/20 bg-white/70 px-8 py-3 text-xs uppercase tracking-[0.3em] text-charcoal transition hover:bg-white"
+            >
+              Restart Run
+            </button>
+          )}
         </div>
         {shareNote && !runFailed && <p className="text-xs text-charcoal/50">{shareNote}</p>}
         {notes.length > 0 && (
