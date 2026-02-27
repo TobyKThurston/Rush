@@ -8,7 +8,7 @@ const BASE_SCORE = 50;
 const TIME_PENALTY = 5;
 const DEBUG_MINI = process.env.NEXT_PUBLIC_RUSH_DEBUG === "1";
 
-const MiniGridGame = ({ onSuccess, onFail, onComplete }: GameProps) => {
+const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   const puzzle = useMemo<MiniGridPuzzle>(() => miniGridPuzzles[0], []);
   const [entries, setEntries] = useState<(string | null)[][]>(
     () => puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
@@ -224,14 +224,14 @@ const MiniGridGame = ({ onSuccess, onFail, onComplete }: GameProps) => {
         clearTimeout(completionTimer.current);
       }
       completionTimer.current = setTimeout(() => {
-        onComplete({ scoreDelta: adjustment, note: "Mini grid composed" });
+        onSuccess({ scoreDelta: adjustment, note: "Mini grid composed" });
       }, 900);
     } else if (signature !== penalizedSignature) {
       setPenalizedSignature(signature);
       setMessage("Letters misaligned.");
       onFail({ note: "Mini grid unsettled", retry: true, timePenalty: TIME_PENALTY });
     }
-  }, [entries, hintUsed, onComplete, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
+  }, [entries, hintUsed, onSuccess, onFail, puzzle.grid, resolved, signature, penalizedSignature]);
 
   useEffect(() => {
     if (!DEBUG_MINI) return;
