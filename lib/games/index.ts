@@ -8,7 +8,7 @@ import { wordle4Game } from "./wordle4";
 import { zipPuzzleGame } from "./zipPuzzle";
 
 export const allGames: RushGame[] = [eliminateGame, guessLanguageGame, miniGridGame, sequenceGame, timingGame, wordle4Game, zipPuzzleGame];
-export const dailyGames: RushGame[] = [eliminateGame, guessLanguageGame, sequenceGame, timingGame, wordle4Game, zipPuzzleGame];
+export const dailyGames: RushGame[] = [eliminateGame, guessLanguageGame, sequenceGame, timingGame, zipPuzzleGame];
 
 export const gameMap: Record<string, RushGame> = Object.fromEntries(
   allGames.map((game) => [game.id.toLowerCase(), game])
