@@ -210,7 +210,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       timeElapsed: 0,
       notes: []
     });
-  }, [games, stageCount, dailyLocked, persistProgress]);
+  }, [games, stageCount, persistProgress]);
 
   useEffect(() => {
     if (phase !== "playing") return;
@@ -309,7 +309,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
 
       advanceToNextGame(currentIndex, "complete");
     },
-    [phase, currentGame, currentIndex, stageCount, advanceToNextGame, clearProgress, lockTodayRun]
+    [phase, currentGame, currentIndex, stageCount, advanceToNextGame, clearProgress]
   );
 
   const handlers = useMemo(
@@ -358,7 +358,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     stageNode = (
       <div className="flex h-full flex-col items-center justify-center gap-8 text-center">
         <p className="text-base text-charcoal/70 max-w-[280px] leading-relaxed">
-          Today's run features composed decisions. Preserve calm, react with precision.
+          Today&apos;s run features composed decisions. Preserve calm, react with precision.
         </p>
         <button
           onClick={startRun}
