@@ -127,13 +127,13 @@ const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
 
   return (
     <div className="flex h-full flex-col justify-center">
-      <div className="mb-6 text-center">
+      <div className="mb-8 text-center">
         <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">
           Sequence - Round {roundIndex + 1} of {rounds.length}
         </p>
         <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">{currentRound.mode}</p>
         <p className="mt-2 text-xs uppercase tracking-[0.28em] text-charcoal/65">{currentRound.difficulty}</p>
-        <div className="mt-4 flex flex-wrap justify-center gap-5 font-serif text-2xl text-charcoal">
+        <div className="mt-5 flex flex-wrap justify-center gap-6 font-serif text-3xl text-charcoal">
           {currentRound.sequence.map((value, index) => (
             <span key={`${currentRound.mode}-${index}`} className="min-w-[2ch] text-center">
               {index === currentRound.missingIndex ? "?" : value.toString()}
@@ -142,7 +142,7 @@ const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
         </div>
       </div>
 
-      <div className="mx-auto grid w-full max-w-md gap-3">
+      <div className="mx-auto grid w-full max-w-xl gap-4">
         {currentRound.options.map((option, index) => {
           const isSelected = selected === index;
           const isCorrectChoice = option === currentRound.answer;
@@ -157,7 +157,7 @@ const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
               key={`${currentRound.sequence.join("-")}-${option}`}
               type="button"
               onClick={() => handleChoice(option, index)}
-              className={`rounded-[16px] border px-4 py-4 font-serif text-xl text-charcoal transition-all duration-200 ease-gentle ${tone}`}
+              className={`rounded-[16px] border px-4 py-5 font-serif text-2xl text-charcoal transition-all duration-200 ease-gentle ${tone}`}
             >
               {option}
             </button>

@@ -197,15 +197,15 @@ const GuessLanguageGame = ({ onSuccess, onFail }: GameProps) => {
 
   return (
     <div className="flex h-full flex-col justify-center">
-      <div className="mb-6 text-center">
+      <div className="mb-8 text-center">
         <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">
           Guess Language - Round {roundIndex + 1} of {TOTAL_ROUNDS}
         </p>
         <p className="mt-2 text-[10px] uppercase tracking-[0.32em] text-charcoal/55">{currentRound.family}</p>
-        <p className="mt-3 px-4 font-serif text-xl text-charcoal">{currentRound.phrase}</p>
+        <p className="mt-4 px-4 font-serif text-2xl text-charcoal">{currentRound.phrase}</p>
       </div>
 
-      <div className="mx-auto grid w-full max-w-md gap-3">
+      <div className="mx-auto grid w-full max-w-xl gap-4">
         {currentRound.options.map((option, index) => {
           const isSelected = selected?.index === index;
           const isCorrectChoice = option === currentRound.answer;
@@ -222,7 +222,7 @@ const GuessLanguageGame = ({ onSuccess, onFail }: GameProps) => {
               key={`${currentRound.phrase}-${option}`}
               type="button"
               onClick={() => handleSelect(option, index)}
-              className={`rounded-[16px] border px-4 py-4 font-serif text-lg text-charcoal transition-all duration-200 ease-gentle ${
+              className={`rounded-[16px] border px-4 py-5 font-serif text-xl text-charcoal transition-all duration-200 ease-gentle ${
                 tone
               } ${revealCorrect ? "border-rosegold/60 shadow-[0_8px_24px_rgba(198,167,125,0.2)]" : ""}`}
             >

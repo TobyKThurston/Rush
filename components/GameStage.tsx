@@ -18,7 +18,7 @@ const GameStage = ({ children, className, label }: GameStageProps) => {
         }`}
       >
         <div className="absolute inset-0 p-5 sm:p-7">
-          <div className="flex h-full w-full items-center justify-center rounded-[32px] bg-white/35 backdrop-blur-[2px] p-4 sm:p-5">
+          <div className="h-full w-full rounded-[32px] bg-white/35 p-4 sm:p-5">
             {children}
           </div>
         </div>

@@ -98,13 +98,13 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
   const indicatorPosition = `${progress}%`;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <p className="text-center text-[10px] uppercase tracking-[0.35em] text-charcoal/55">Rhythm Style: {style}</p>
-      <p className="text-center text-sm text-charcoal/70">Tap once as the pulse drifts softly through the calm band.</p>
+      <p className="text-center text-base text-charcoal/70">Tap once as the pulse drifts softly through the calm band.</p>
       <button
         type="button"
         onClick={handleTap}
-        className="relative h-28 w-full rounded-[30px] border border-white/70 bg-ivory/75"
+        className="relative h-40 w-full rounded-[30px] border border-white/70 bg-ivory/75"
       >
         <div className="absolute inset-x-8 top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-transparent via-warmGrey/50 to-transparent" />
         <div
@@ -124,9 +124,9 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
         <div className="absolute inset-0 rounded-[30px] border border-white/60" />
       </button>
       {result && (
-        <div className="text-center font-serif text-lg text-rosegold transition-opacity duration-300">
+        <div className="text-center font-serif text-2xl text-rosegold transition-opacity duration-300">
           {result}
-          {awardedScore !== null && <span className="ml-2 text-sm text-charcoal/60">(+{awardedScore})</span>}
+          {awardedScore !== null && <span className="ml-2 text-base text-charcoal/60">(+{awardedScore})</span>}
         </div>
       )}
     </div>

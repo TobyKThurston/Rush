@@ -75,17 +75,17 @@ const EliminateGame = ({ onSuccess, onFail }: GameProps) => {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="mb-4 text-center">
+      <div className="mb-6 text-center">
         <p className="text-xs uppercase tracking-[0.4em] text-warmGrey">Eliminate — Round {roundIndex + 1} of {TOTAL_ELIMINATE_ROUNDS}</p>
         <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">
           {puzzle.mode}: {puzzle.explanation}
         </p>
-        <h3 className="mt-3 font-serif text-lg text-charcoal">Select the item that does not belong.</h3>
+        <h3 className="mt-3 font-serif text-xl text-charcoal">Select the item that does not belong.</h3>
       </div>
       <div
         className={`flex-1 transition-opacity duration-200 ease-gentle ${transitioning ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-5">
           {puzzle.items.map((item, index) => {
             const isActive = interaction?.index === index;
             const isWrong = isActive && interaction?.type === "wrong";
@@ -102,16 +102,16 @@ const EliminateGame = ({ onSuccess, onFail }: GameProps) => {
                 key={`${item}-${index}`}
                 type="button"
                 onClick={() => handleSelect(index)}
-                className={`flex min-h-[80px] flex-col justify-center rounded-[16px] border px-4 py-5 text-center transition-all duration-200 ease-gentle ${
+                className={`flex min-h-[100px] flex-col justify-center rounded-[16px] border px-4 py-6 text-center transition-all duration-200 ease-gentle ${
                   baseTone
                 } ${accentShadow} ${shakeClass}`}
               >
-                <span className="font-serif text-lg text-charcoal">{item}</span>
+                <span className="font-serif text-xl text-charcoal">{item}</span>
               </button>
             );
           })}
         </div>
-        {feedback && <p className="mt-5 text-center text-xs text-charcoal/60">{feedback}</p>}
+        {feedback && <p className="mt-6 text-center text-sm text-charcoal/60">{feedback}</p>}
       </div>
     </div>
   );

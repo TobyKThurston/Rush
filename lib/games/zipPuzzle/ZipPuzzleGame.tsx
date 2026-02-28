@@ -100,7 +100,7 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
     }
   };
 
-  const gridDimension = Math.min(500, size * 72);
+  const gridDimension = Math.min(570, size * 88);
 
   return (
     <div className="flex h-full flex-col gap-6">
@@ -122,7 +122,7 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
       </div>
       <div className="flex min-h-0 flex-1 items-center justify-center">
         <div
-          className="relative aspect-square h-full w-full max-h-[500px] select-none"
+          className="relative aspect-square h-full w-full max-h-[570px] select-none"
           style={{ maxWidth: `${gridDimension}px` }}
         >
           <div className="absolute inset-0 rounded-[28px] bg-ivory/80 p-4 shadow-inner">
