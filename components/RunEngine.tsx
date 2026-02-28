@@ -40,6 +40,7 @@ type RunEngineState = {
   stageNode: ReactNode;
   successOverlay: { finalStage: boolean } | null;
   acknowledgeSuccess: () => void;
+  penaltyCount: number;
 };
 
 type RunEngineProps = {
@@ -63,6 +64,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
   const [successOverlay, setSuccessOverlay] = useState<{ finalStage: boolean } | null>(null);
   const [runFailed, setRunFailed] = useState(false);
   const [dailyLocked, setDailyLocked] = useState(false);
+  const [penaltyCount, setPenaltyCount] = useState(0);
   const pendingAdvance = useRef<{ stageIndex: number } | null>(null);
   const advanceGuard = useRef(false);
   const completionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -288,6 +290,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       if (result === "fail") {
         const penalty = payload?.timePenalty ?? DEFAULT_TIME_PENALTY;
         setTimeElapsed((prev) => prev + penalty);
+        setPenaltyCount((prev) => prev + 1);
         if (payload?.retry) {
           return;
         }
@@ -375,57 +378,37 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     );
   } else if (phase === "finished") {
     stageNode = (
-      <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-sm uppercase tracking-[0.35em] text-warmGrey">Final Time</p>
-          <p className="font-serif text-7xl text-charcoal">{formattedTime}</p>
+      <div className="flex h-full flex-col items-center justify-center gap-8 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">Final Time</p>
+          <p className="font-serif text-8xl text-charcoal">{formattedTime}</p>
+          <p className="text-sm text-charcoal/60">
+            {runFailed ? "Run interrupted." : "Daily run complete."}
+          </p>
         </div>
-        <p className="text-base text-charcoal/70">
-          {runFailed ? "Run interrupted." : "Daily run complete."}
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          {!runFailed && (
-            <button
-              onClick={async () => {
-                const payload = `Completed THE RUSH in ${formattedTime}.`;
-                try {
-                  if (navigator.share) {
-                    await navigator.share({ title: "The Rush", text: payload });
-                    setShareNote("Shared with grace.");
-                    return;
-                  }
-                  await navigator.clipboard.writeText(payload);
-                  setShareNote("Copied to clipboard.");
-                } catch (error) {
-                  setShareNote("Sharing unavailable.");
+        {!runFailed && (
+          <button
+            onClick={async () => {
+              const payload = `Completed THE RUSH in ${formattedTime}.`;
+              try {
+                if (navigator.share) {
+                  await navigator.share({ title: "The Rush", text: payload });
+                  setShareNote("Shared.");
+                  return;
                 }
-              }}
-              className="rounded-full border border-rosegold/50 bg-white/70 px-10 py-4 text-sm uppercase tracking-[0.3em] text-charcoal transition hover:shadow-subtle"
-            >
-              Share Result
-            </button>
-          )}
-          {dailyLocked ? (
-            <div className="rounded-[20px] border border-white/70 bg-white/60 px-6 py-4">
-              <SunriseCountdown />
-            </div>
-          ) : (
-            <button
-              onClick={startRun}
-              className="rounded-full border border-charcoal/20 bg-white/70 px-10 py-4 text-sm uppercase tracking-[0.3em] text-charcoal transition hover:bg-white"
-            >
-              Restart Run
-            </button>
-          )}
-        </div>
-        {shareNote && !runFailed && <p className="text-sm text-charcoal/50">{shareNote}</p>}
-        {notes.length > 0 && (
-          <ul className="space-y-1 text-sm text-charcoal/60">
-            {notes.map((entry, idx) => (
-              <li key={`${entry}-${idx}`}>{entry}</li>
-            ))}
-          </ul>
+                await navigator.clipboard.writeText(payload);
+                setShareNote("Copied.");
+              } catch {
+                setShareNote("Unavailable.");
+              }
+            }}
+            className="rounded-full border border-rosegold/50 bg-white/70 px-10 py-4 text-sm uppercase tracking-[0.3em] text-charcoal transition hover:shadow-subtle"
+          >
+            Share
+          </button>
         )}
+        {shareNote && <p className="text-xs text-charcoal/50">{shareNote}</p>}
+        <SunriseCountdown />
       </div>
     );
   } else if (phase === "playing" && currentGame) {
@@ -454,7 +437,8 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         start: startRun,
         stageNode,
         successOverlay,
-        acknowledgeSuccess
+        acknowledgeSuccess,
+        penaltyCount
       })
     }</>
   );

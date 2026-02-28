@@ -7,9 +7,10 @@ type HeaderProps = {
   phase: string;
   currentIndex: number;
   totalStages: number;
+  penaltyCount?: number;
 };
 
-const FixedHeader = ({ timeElapsed, phase, currentIndex, totalStages }: HeaderProps) => {
+const FixedHeader = ({ timeElapsed, phase, currentIndex, totalStages, penaltyCount = 0 }: HeaderProps) => {
   const formattedTime = formatTime(timeElapsed);
   return (
     <header
@@ -40,7 +41,7 @@ const FixedHeader = ({ timeElapsed, phase, currentIndex, totalStages }: HeaderPr
       </div>
       <div className="flex flex-col items-end">
         <span className="text-[11px] uppercase tracking-[0.3em] text-warmGrey/70">Time</span>
-        <span className="text-xl font-medium tracking-normal text-charcoal">{formattedTime}</span>
+        <span key={penaltyCount} className={`text-xl font-medium tracking-normal text-charcoal${penaltyCount > 0 ? " animate-penaltyFlash" : ""}`}>{formattedTime}</span>
       </div>
     </header>
   );

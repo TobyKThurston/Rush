@@ -10,13 +10,14 @@ import CenteredStageLayout from "@/components/CenteredStageLayout";
 const RunPage = () => {
   return (
     <RunEngine games={dailyGames}>
-      {({ phase, currentIndex, totalStages, timeElapsed, stageNode, successOverlay, acknowledgeSuccess }) => (
+      {({ phase, currentIndex, totalStages, timeElapsed, penaltyCount, stageNode, successOverlay, acknowledgeSuccess }) => (
         <>
           <FixedHeader
             phase={phase}
             currentIndex={currentIndex}
             totalStages={totalStages}
             timeElapsed={timeElapsed}
+            penaltyCount={penaltyCount}
           />
           <CenteredStageLayout>
             <GameStage className={successOverlay ? "bg-[#f7f3ed]" : ""}>
