@@ -177,7 +177,6 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
   }, [phase, games]);
 
   const startRun = useCallback(() => {
-    if (dailyLocked) return;
     const selection: RushGame[] = [];
     const shuffled = [...games];
     for (let i = 0; i < (stageCount || 1); i += 1) {
@@ -197,6 +196,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     setIsTransitioning(false);
     setShareNote(null);
     setRunFailed(false);
+    setPenaltyCount(0);
     advanceGuard.current = false;
     if (completionTimer.current) {
       clearTimeout(completionTimer.current);
@@ -252,7 +252,6 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         setIsTransitioning(false);
         if (isFinalStage) {
           setPhase("finished");
-          lockTodayRun();
           clearProgress();
           router.replace("/run");
           return;
@@ -271,7 +270,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         router.replace("/run");
       }, 220);
     },
-    [clearProgress, lockTodayRun, notes, persistProgress, router, score, sequence, stageCount, timeElapsed]
+    [clearProgress, notes, persistProgress, router, score, sequence, stageCount, timeElapsed]
   );
 
   const resolveStage = useCallback(
@@ -296,7 +295,6 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         }
         setRunFailed(true);
         setPhase("finished");
-        lockTodayRun();
         clearProgress();
         return;
       }
@@ -360,20 +358,14 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     stageNode = (
       <div className="flex h-full flex-col items-center justify-center gap-8 text-center">
         <p className="text-base text-charcoal/70 max-w-[280px] leading-relaxed">
-          {dailyLocked
-            ? "Daily run is complete. A new run unlocks at 11:59 PM."
-            : "Today's run features composed decisions. Preserve calm, react with precision."}
+          Today's run features composed decisions. Preserve calm, react with precision.
         </p>
-        {dailyLocked ? (
-          <SunriseCountdown />
-        ) : (
-          <button
-            onClick={startRun}
-            className="rounded-full border border-charcoal/10 bg-charcoal px-12 py-4 text-sm uppercase tracking-[0.35em] text-ivory hover:bg-charcoal/90"
-          >
-            Begin Run
-          </button>
-        )}
+        <button
+          onClick={startRun}
+          className="rounded-full border border-charcoal/10 bg-charcoal px-12 py-4 text-sm uppercase tracking-[0.35em] text-ivory hover:bg-charcoal/90"
+        >
+          Begin Run
+        </button>
       </div>
     );
   } else if (phase === "finished") {
@@ -408,7 +400,12 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
           </button>
         )}
         {shareNote && <p className="text-xs text-charcoal/50">{shareNote}</p>}
-        <SunriseCountdown />
+        <button
+          onClick={startRun}
+          className="rounded-full border border-charcoal/20 bg-white/70 px-10 py-4 text-sm uppercase tracking-[0.3em] text-charcoal transition hover:bg-white"
+        >
+          Play Again
+        </button>
       </div>
     );
   } else if (phase === "playing" && currentGame) {
