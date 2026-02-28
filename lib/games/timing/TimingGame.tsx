@@ -6,6 +6,8 @@ import type { GameProps } from "@/types/Game";
 type PulseResult = "Perfect" | "Great" | "Good" | "Miss";
 type PulseStyle = "Sine" | "Triangle" | "Drift";
 
+const TOTAL_ROUNDS = 2;
+
 const scoreByResult: Record<PulseResult, { delta: number; note: string; success: boolean }> = {
   Perfect: { delta: 140, note: "Pulse aligned", success: true },
   Great: { delta: 120, note: "Harmonic timing", success: true },
@@ -24,26 +26,31 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
   const [progress, setProgress] = useState(50);
   const [result, setResult] = useState<PulseResult | null>(null);
   const [awardedScore, setAwardedScore] = useState<number | null>(null);
+  const [round, setRound] = useState(0);
+  const [totalScore, setTotalScore] = useState(0);
   const rafRef = useRef<number | null>(null);
   const startRef = useRef<number | null>(null);
   const resolved = useRef(false);
 
   const isArcade = !status;
-  const style = useMemo<PulseStyle>(() => {
-    const styles: PulseStyle[] = ["Sine", "Triangle", "Drift"];
-    return styles[Math.floor(Math.random() * styles.length)];
-  }, []);
 
-  const speed = useMemo(() => (isArcade ? 0.05 + Math.random() * 0.05 : 0.12 + Math.random() * 0.1), [isArcade]);
-  const zone = useMemo(() => {
-    const width = 8 + Math.random() * 10;
-    const center = 20 + Math.random() * 60;
-    const start = Math.max(4, center - width / 2);
-    const end = Math.min(96, start + width);
-    return { start, end };
-  }, []);
+  const roundConfigs = useMemo(() =>
+    Array.from({ length: TOTAL_ROUNDS }, () => {
+      const styles: PulseStyle[] = ["Sine", "Triangle", "Drift"];
+      const style = styles[Math.floor(Math.random() * styles.length)];
+      const speed = isArcade ? 0.05 + Math.random() * 0.05 : 0.12 + Math.random() * 0.1;
+      const width = 8 + Math.random() * 10;
+      const center = 20 + Math.random() * 60;
+      const zoneStart = Math.max(4, center - width / 2);
+      const zoneEnd = Math.min(96, zoneStart + width);
+      return { style, speed, zone: { start: zoneStart, end: zoneEnd } };
+    }), [isArcade]
+  );
+
+  const { style, speed, zone } = roundConfigs[round];
 
   useEffect(() => {
+    startRef.current = null;
     const animate = (timestamp: number) => {
       if (startRef.current === null) {
         startRef.current = timestamp;
@@ -74,6 +81,7 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
     if (resolved.current) return;
     resolved.current = true;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
     const center = (zone.start + zone.end) / 2;
     const spread = zone.end - zone.start;
     const distance = Math.abs(progress - center);
@@ -85,13 +93,27 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
     } else if (distance <= spread / 2) {
       evaluation = "Good";
     }
+
     const outcome = scoreByResult[evaluation];
+    const nextTotal = totalScore + outcome.delta;
     setResult(evaluation);
     setAwardedScore(outcome.delta);
-    if (outcome.success) {
-      onSuccess({ scoreDelta: outcome.delta, note: outcome.note });
-    } else {
+
+    if (!outcome.success) {
       onFail({ note: outcome.note, timePenalty: 5 });
+      return;
+    }
+
+    if (round < TOTAL_ROUNDS - 1) {
+      setTimeout(() => {
+        resolved.current = false;
+        setTotalScore(nextTotal);
+        setRound((prev) => prev + 1);
+        setResult(null);
+        setAwardedScore(null);
+      }, 600);
+    } else {
+      onSuccess({ scoreDelta: nextTotal, note: outcome.note });
     }
   };
 
@@ -99,7 +121,9 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
 
   return (
     <div className="space-y-6">
-      <p className="text-center text-[10px] uppercase tracking-[0.35em] text-charcoal/55">Rhythm Style: {style}</p>
+      <p className="text-center text-[10px] uppercase tracking-[0.35em] text-charcoal/55">
+        Round {round + 1} of {TOTAL_ROUNDS} · {style}
+      </p>
       <p className="text-center text-base text-charcoal/70">Tap once as the pulse drifts softly through the calm band.</p>
       <button
         type="button"

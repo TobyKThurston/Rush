@@ -84,7 +84,7 @@ const shuffle = <T,>(items: T[]) => {
 
 const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
   const rounds = useMemo(
-    () => shuffle(ROUNDS).slice(0, 4).map((round) => ({ ...round, options: shuffle(round.options) })),
+    () => shuffle(ROUNDS).slice(0, 2).map((round) => ({ ...round, options: shuffle(round.options) })),
     []
   );
   const [roundIndex, setRoundIndex] = useState(0);
