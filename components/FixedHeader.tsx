@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const HEADER_H = 72;
+const HEADER_H = 84;
 
 type HeaderProps = {
   timeElapsed: number;
@@ -24,9 +24,9 @@ const FixedHeader = ({ timeElapsed, phase, currentIndex, totalStages }: HeaderPr
           Arcade
         </Link>
       </div>
-      <div className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1">
-        <span className="font-serif text-lg tracking-[0.4em] text-charcoal">THE RUSH</span>
-        <div className="flex items-center gap-2">
+      <div className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5">
+        <span className="font-serif text-2xl tracking-[0.4em] text-charcoal">THE RUSH</span>
+        <div className="flex items-center gap-2.5">
           {Array.from({ length: totalStages }).map((_, idx) => {
             const isComplete = idx < currentIndex;
             const isCurrent = phase === "playing" && idx === currentIndex;
@@ -34,13 +34,13 @@ const FixedHeader = ({ timeElapsed, phase, currentIndex, totalStages }: HeaderPr
             if (phase === "finished") fill = "bg-rosegold";
             else if (isComplete) fill = "bg-charcoal/50";
             else if (isCurrent) fill = "bg-rosegold";
-            return <span key={idx} className={`h-1.5 w-1.5 rounded-full ${fill}`} />;
+            return <span key={idx} className={`h-2.5 w-2.5 rounded-full ${fill}`} />;
           })}
         </div>
       </div>
-      <div className="flex flex-col items-end text-[11px]">
-        <span>Time</span>
-        <span className="text-base font-medium tracking-normal">{phase === "playing" ? formattedTime : formattedTime}</span>
+      <div className="flex flex-col items-end">
+        <span className="text-[11px] uppercase tracking-[0.3em] text-warmGrey/70">Time</span>
+        <span className="text-xl font-medium tracking-normal text-charcoal">{formattedTime}</span>
       </div>
     </header>
   );

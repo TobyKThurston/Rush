@@ -355,18 +355,18 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
 
   if (phase === "idle") {
     stageNode = (
-      <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
-        <p className="text-sm text-charcoal/70">
+      <div className="flex h-full flex-col items-center justify-center gap-8 text-center">
+        <p className="text-base text-charcoal/70 max-w-[280px] leading-relaxed">
           {dailyLocked
             ? "Daily run is complete. A new run unlocks at 11:59 PM."
-            : "Today&apos;s run features composed decisions. Preserve calm, react with precision."}
+            : "Today's run features composed decisions. Preserve calm, react with precision."}
         </p>
         {dailyLocked ? (
           <SunriseCountdown />
         ) : (
           <button
             onClick={startRun}
-            className="rounded-full border border-charcoal/10 bg-charcoal px-10 py-3 text-xs uppercase tracking-[0.35em] text-ivory hover:bg-charcoal/90"
+            className="rounded-full border border-charcoal/10 bg-charcoal px-12 py-4 text-sm uppercase tracking-[0.35em] text-ivory hover:bg-charcoal/90"
           >
             Begin Run
           </button>
@@ -376,11 +376,11 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
   } else if (phase === "finished") {
     stageNode = (
       <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
-        <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">Final Time</p>
-          <p className="font-serif text-5xl text-charcoal">{formattedTime}</p>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-sm uppercase tracking-[0.35em] text-warmGrey">Final Time</p>
+          <p className="font-serif text-7xl text-charcoal">{formattedTime}</p>
         </div>
-        <p className="text-sm text-charcoal/70">
+        <p className="text-base text-charcoal/70">
           {runFailed ? "Run interrupted." : "Daily run complete."}
         </p>
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -400,7 +400,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
                   setShareNote("Sharing unavailable.");
                 }
               }}
-              className="rounded-full border border-rosegold/50 bg-white/70 px-8 py-3 text-xs uppercase tracking-[0.3em] text-charcoal transition hover:shadow-subtle"
+              className="rounded-full border border-rosegold/50 bg-white/70 px-10 py-4 text-sm uppercase tracking-[0.3em] text-charcoal transition hover:shadow-subtle"
             >
               Share Result
             </button>
@@ -412,15 +412,15 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
           ) : (
             <button
               onClick={startRun}
-              className="rounded-full border border-charcoal/20 bg-white/70 px-8 py-3 text-xs uppercase tracking-[0.3em] text-charcoal transition hover:bg-white"
+              className="rounded-full border border-charcoal/20 bg-white/70 px-10 py-4 text-sm uppercase tracking-[0.3em] text-charcoal transition hover:bg-white"
             >
               Restart Run
             </button>
           )}
         </div>
-        {shareNote && !runFailed && <p className="text-xs text-charcoal/50">{shareNote}</p>}
+        {shareNote && !runFailed && <p className="text-sm text-charcoal/50">{shareNote}</p>}
         {notes.length > 0 && (
-          <ul className="space-y-1 text-xs text-charcoal/60">
+          <ul className="space-y-1 text-sm text-charcoal/60">
             {notes.map((entry, idx) => (
               <li key={`${entry}-${idx}`}>{entry}</li>
             ))}
