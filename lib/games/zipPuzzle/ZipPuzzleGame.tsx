@@ -155,7 +155,7 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
         <p className="mt-1 sm:mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">
           {difficulty} mode • {size}x{size}
         </p>
-        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-charcoal/70">Glide through every anchor with a single composed line.</p>
+        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-charcoal/70">Glide through every anchor with a single composed line — filling every square.</p>
       </div>
       <div className="flex justify-center">
         <button
