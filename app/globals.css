@@ -24,7 +24,7 @@ body {
 
 /* Game stage: tall rectangle on mobile, square on sm+ */
 .game-stage-inner {
-  height: calc(100dvh - 84px - env(safe-area-inset-top, 0px) - 1rem);
+  height: calc(100dvh - 64px - env(safe-area-inset-top, 0px) - 1rem);
 }
 
 @media (min-width: 640px) {
