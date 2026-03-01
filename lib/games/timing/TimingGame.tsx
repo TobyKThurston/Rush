@@ -23,7 +23,7 @@ const triangleWave = (phase: number) => {
   return 2 - scaled;
 };
 
-const TimingGame = ({ onSuccess, onFail, status, seed }: GameProps) => {
+const TimingGame = ({ onSuccess, onFail, onComplete, status, seed }: GameProps) => {
   const [progress, setProgress] = useState(50);
   const [result, setResult] = useState<PulseResult | null>(null);
   const [awardedScore, setAwardedScore] = useState<number | null>(null);
@@ -102,7 +102,20 @@ const TimingGame = ({ onSuccess, onFail, status, seed }: GameProps) => {
     setAwardedScore(outcome.delta);
 
     if (!outcome.success) {
-      onFail({ note: outcome.note, timePenalty: 5 });
+      onFail({ note: outcome.note, timePenalty: 5, retry: true });
+      if (round < TOTAL_ROUNDS - 1) {
+        setTimeout(() => {
+          resolved.current = false;
+          setTotalScore(nextTotal);
+          setRound((prev) => prev + 1);
+          setResult(null);
+          setAwardedScore(null);
+        }, 600);
+      } else {
+        setTimeout(() => {
+          onComplete({ scoreDelta: nextTotal, note: outcome.note });
+        }, 800);
+      }
       return;
     }
 
