@@ -65,6 +65,81 @@ export const eliminateCategories: EliminateCategory[] = [
     name: "US States",
     pool: ["Texas", "Nevada", "Oregon", "Florida", "Georgia", "Ohio", "Alaska"],
     intruders: ["Toronto", "Lima", "Seoul"]
+  },
+  {
+    name: "Summer Olympics Host Cities",
+    pool: ["Tokyo", "Rio", "London", "Beijing", "Athens", "Sydney", "Atlanta", "Barcelona"],
+    intruders: ["Geneva", "Dubai", "Shanghai"]
+  },
+  {
+    name: "Winter Olympics Host Cities",
+    pool: ["Beijing", "PyeongChang", "Sochi", "Vancouver", "Turin", "Salt Lake City", "Nagano", "Lillehammer"],
+    intruders: ["Dubai", "Toronto", "Shanghai"]
+  },
+  {
+    name: "Olympic Figure Skating Gold Medalists",
+    pool: ["Yuzuru Hanyu", "Nathan Chen", "Alexei Yagudin", "Kim Yuna", "Tara Lipinski", "Shizuka Arakawa", "Sarah Hughes"],
+    intruders: ["Michelle Kwan", "Sasha Cohen", "Elene Gedevanishvili"]
+  },
+  {
+    name: "Olympic Freestyle/Snow Sports Gold Medalists",
+    pool: ["Eileen Gu", "Chloe Kim", "Kelly Clark", "Jamie Anderson", "Torah Bright"],
+    intruders: ["Lindsey Vonn", "Mikaela Shiffrin", "Bode Miller"]
+  },
+  {
+    name: "Grammy Album of the Year Winners",
+    pool: ["Midnights", "Golden Hour", "25", "1989", "The Suburbs", "Rumours", "We Are"],
+    intruders: ["Reputation", "Lover", "Born This Way"]
+  },
+  {
+    name: "Academy Award Best Picture Winners",
+    pool: ["Everything Everywhere All at Once", "CODA", "Nomadland", "Parasite", "Green Book", "The Shape of Water", "Moonlight", "Spotlight"],
+    intruders: ["Marriage Story", "Joker", "Roma"]
+  },
+  {
+    name: "Legendary Jazz Artists",
+    pool: ["Miles Davis", "John Coltrane", "Thelonious Monk", "Charlie Parker", "Duke Ellington", "Billie Holiday", "Chet Baker"],
+    intruders: ["Norah Jones", "Diana Krall", "Jamie Cullum"]
+  },
+  {
+    name: "Acclaimed Arthouse Film Directors",
+    pool: ["Stanley Kubrick", "Akira Kurosawa", "Wong Kar-wai", "Agnès Varda", "Federico Fellini", "Ingmar Bergman"],
+    intruders: ["Steven Spielberg", "Christopher Nolan", "James Cameron"]
+  },
+  {
+    name: "Legendary Fashion Designers",
+    pool: ["Coco Chanel", "Yves Saint Laurent", "Christian Dior", "Cristóbal Balenciaga", "Gianni Versace", "Alexander McQueen", "Virgil Abloh"],
+    intruders: ["Donatella Versace", "Karl Lagerfeld", "Marc Jacobs"]
+  },
+  {
+    name: "Fashion Week Host Cities",
+    pool: ["Paris", "Milan", "New York", "London", "Copenhagen", "Tokyo"],
+    intruders: ["Berlin", "Barcelona", "Chicago"]
+  },
+  {
+    name: "Michelin Three-Star Chefs",
+    pool: ["Gordon Ramsay", "Alain Ducasse", "Thomas Keller", "Joël Robuchon", "Heston Blumenthal", "Pierre Gagnaire"],
+    intruders: ["Jamie Oliver", "Nigella Lawson", "Bobby Flay"]
+  },
+  {
+    name: "FIFA World Cup Host Nations",
+    pool: ["Brazil", "Germany", "South Africa", "Russia", "Qatar", "Mexico", "Argentina", "Italy", "France"],
+    intruders: ["Colombia", "Australia", "Portugal"]
+  },
+  {
+    name: "Seven Wonders of the Ancient World",
+    pool: ["Great Pyramid of Giza", "Colossus of Rhodes", "Lighthouse of Alexandria", "Mausoleum at Halicarnassus", "Temple of Artemis", "Statue of Zeus"],
+    intruders: ["Parthenon", "Pantheon", "Colosseum"]
+  },
+  {
+    name: "Countries Whose Flag Has Red",
+    pool: ["Japan", "Canada", "Switzerland", "Turkey", "China", "Denmark", "United States"],
+    intruders: ["Brazil", "Jamaica", "Ireland"]
+  },
+  {
+    name: "UNESCO-Recognized Cuisines",
+    pool: ["French Gastronomy", "Mexican Cuisine", "Mediterranean Diet", "Japanese Washoku", "Turkish Coffee Culture"],
+    intruders: ["Italian Pizza", "Chinese Dim Sum", "Indian Curry"]
   }
 ];
 
@@ -118,5 +193,30 @@ export const propertyRules: PropertyRule[] = [
     description: "Words that start with ST",
     correctPool: ["Stone", "Starlit", "Stanza", "Stitch", "Studio", "Stream", "Sturdy"],
     intruderPool: ["Silver", "Shimmer", "Signal"]
+  },
+  {
+    description: "Summer Olympic years (1996–2020)",
+    correctPool: ["1996", "2000", "2004", "2008", "2012", "2016", "2020"],
+    intruderPool: ["1994", "1998", "2002"]
+  },
+  {
+    description: "Palindromes",
+    correctPool: ["Civic", "Radar", "Level", "Madam", "Refer", "Kayak", "Noon"],
+    intruderPool: ["Civil", "River", "Lever"]
+  },
+  {
+    description: "Countries that drive on the left",
+    correctPool: ["Japan", "India", "Australia", "United Kingdom", "New Zealand", "South Africa", "Ireland"],
+    intruderPool: ["France", "Germany", "China"]
+  },
+  {
+    description: "Words that are also musical terms",
+    correctPool: ["Rest", "Scale", "Bridge", "Bar", "Sharp", "Flat", "Key"],
+    intruderPool: ["Pizzicato", "Tremolo", "Fortissimo"]
+  },
+  {
+    description: "NATO phonetic alphabet words",
+    correctPool: ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf"],
+    intruderPool: ["Able", "Baker", "Cast"]
   }
 ];

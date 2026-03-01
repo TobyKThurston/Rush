@@ -68,6 +68,31 @@ const SEQUENCE_RULES = [
     explanation: "Roman numerals",
     valid: ["I", "II", "III", "IV", "V", "VI", "VII"],
     intruders: ["A", "B", "C"]
+  },
+  {
+    explanation: "Summer Olympics host years",
+    valid: ["1996", "2000", "2004", "2008", "2012", "2016", "2020"],
+    intruders: ["1994", "1998", "2002"]
+  },
+  {
+    explanation: "FIFA World Cup years",
+    valid: ["1990", "1994", "1998", "2002", "2006", "2010", "2014"],
+    intruders: ["1992", "1996", "2000"]
+  },
+  {
+    explanation: "Powers of 2",
+    valid: ["1", "2", "4", "8", "16", "32", "64"],
+    intruders: ["6", "12", "24"]
+  },
+  {
+    explanation: "Fibonacci sequence numbers",
+    valid: ["1", "2", "3", "5", "8", "13", "21"],
+    intruders: ["4", "6", "9"]
+  },
+  {
+    explanation: "NATO phonetic alphabet words",
+    valid: ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf"],
+    intruders: ["Able", "Baker", "Cast"]
   }
 ] as const;
 

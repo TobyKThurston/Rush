@@ -14,13 +14,45 @@ type SequenceRound = {
   points: number;
 };
 
-const ROUNDS: SequenceRound[] = [
+const ROUND_POOL: SequenceRound[] = [
   {
     difficulty: "Easy",
     sequence: [2, 4, 6, 8, 10],
     missingIndex: 3,
     answer: 8,
     options: [7, 8, 9],
+    points: 35
+  },
+  {
+    difficulty: "Easy",
+    sequence: [5, 10, 15, 20, 25],
+    missingIndex: 2,
+    answer: 15,
+    options: [12, 15, 18],
+    points: 35
+  },
+  {
+    difficulty: "Easy",
+    sequence: [1996, 2000, 2004, 2008, 2012],
+    missingIndex: 1,
+    answer: 2000,
+    options: [1999, 2000, 2002],
+    points: 35
+  },
+  {
+    difficulty: "Easy",
+    sequence: [1994, 1998, 2002, 2006, 2010],
+    missingIndex: 4,
+    answer: 2010,
+    options: [2008, 2009, 2010],
+    points: 35
+  },
+  {
+    difficulty: "Easy",
+    sequence: [1, 3, 5, 7, 9],
+    missingIndex: 0,
+    answer: 1,
+    options: [1, 2, 4],
     points: 35
   },
   {
@@ -32,11 +64,75 @@ const ROUNDS: SequenceRound[] = [
     points: 45
   },
   {
+    difficulty: "Medium",
+    sequence: [2, 4, 8, 16, 32],
+    missingIndex: 2,
+    answer: 8,
+    options: [6, 8, 12],
+    points: 45
+  },
+  {
+    difficulty: "Medium",
+    sequence: [1, 4, 9, 16, 25],
+    missingIndex: 3,
+    answer: 16,
+    options: [14, 16, 20],
+    points: 45
+  },
+  {
+    difficulty: "Medium",
+    sequence: [2, 3, 5, 7, 11],
+    missingIndex: 1,
+    answer: 3,
+    options: [3, 4, 6],
+    points: 45
+  },
+  {
+    difficulty: "Medium",
+    sequence: [1994, 1998, 2002, 2006, 2010],
+    missingIndex: 3,
+    answer: 2006,
+    options: [2004, 2006, 2008],
+    points: 45
+  },
+  {
     difficulty: "Decently Hard",
     sequence: [7, 11, 18, 29, 47],
     missingIndex: 2,
     answer: 18,
     options: [17, 18, 21],
+    points: 60
+  },
+  {
+    difficulty: "Decently Hard",
+    sequence: [1, 1, 2, 3, 5],
+    missingIndex: 4,
+    answer: 5,
+    options: [4, 5, 6],
+    points: 60
+  },
+  {
+    difficulty: "Decently Hard",
+    sequence: [1, 3, 6, 10, 15],
+    missingIndex: 3,
+    answer: 10,
+    options: [9, 10, 12],
+    points: 60
+  },
+  {
+    difficulty: "Decently Hard",
+    sequence: [1, 8, 27, 64, 125],
+    missingIndex: 2,
+    answer: 27,
+    options: [24, 27, 32],
+    points: 60
+  },
+  {
+    difficulty: "Decently Hard",
+    sequence: [3, 5, 8, 12, 17],
+    missingIndex: 3,
+    answer: 12,
+    options: [11, 12, 13],
     points: 60
   }
 ];
@@ -51,7 +147,7 @@ const shuffle = <T,>(items: T[]) => {
 };
 
 const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
-  const rounds = useMemo(() => ROUNDS.map((round) => ({ ...round, options: shuffle(round.options) })), []);
+  const rounds = useMemo(() => shuffle([...ROUND_POOL]).slice(0, 3).map((round) => ({ ...round, options: shuffle(round.options) })), []);
   const [roundIndex, setRoundIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [locked, setLocked] = useState(false);

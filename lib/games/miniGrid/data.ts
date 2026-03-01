@@ -58,6 +58,72 @@ const WORD_BANKS: Array<{ title: string; entries: WordEntry[] }> = [
       { answer: "OLIVE", clue: "Mediterranean fruit" },
       { answer: "HONEY", clue: "Bee-made sweetener" }
     ]
+  },
+  {
+    title: "Olympics",
+    entries: [
+      { answer: "GOLD", clue: "Top medal color" },
+      { answer: "RELAY", clue: "Team baton race" },
+      { answer: "TORCH", clue: "Flame carried to the Games" },
+      { answer: "BOUT", clue: "Boxing or wrestling match" },
+      { answer: "RINK", clue: "Ice skating venue" },
+      { answer: "HEAT", clue: "Qualifying round" }
+    ]
+  },
+  {
+    title: "Music",
+    entries: [
+      { answer: "ARIA", clue: "Operatic solo" },
+      { answer: "JAZZ", clue: "Improvised American genre" },
+      { answer: "RIFF", clue: "Repeated guitar phrase" },
+      { answer: "CLEF", clue: "Staff symbol for pitch" },
+      { answer: "FLAT", clue: "Half-step lower notation" },
+      { answer: "CODA", clue: "Closing section of a piece" }
+    ]
+  },
+  {
+    title: "Film",
+    entries: [
+      { answer: "NOIR", clue: "Dark crime film style" },
+      { answer: "REEL", clue: "Film spool" },
+      { answer: "LENS", clue: "Camera optic" },
+      { answer: "EDIT", clue: "Post-production cut" },
+      { answer: "FADE", clue: "Scene transition" },
+      { answer: "CREW", clue: "Production team" }
+    ]
+  },
+  {
+    title: "Fashion",
+    entries: [
+      { answer: "LACE", clue: "Delicate woven fabric" },
+      { answer: "SILK", clue: "Luxurious natural fiber" },
+      { answer: "VEIL", clue: "Sheer bridal covering" },
+      { answer: "SEAM", clue: "Stitched fabric join" },
+      { answer: "PLEAT", clue: "Folded fabric detail" },
+      { answer: "TWEED", clue: "Woven wool associated with Chanel" }
+    ]
+  },
+  {
+    title: "Culinary",
+    entries: [
+      { answer: "ROUX", clue: "Butter and flour base" },
+      { answer: "BRIE", clue: "Soft French cheese" },
+      { answer: "TART", clue: "Open pastry shell" },
+      { answer: "ZEST", clue: "Grated citrus peel" },
+      { answer: "BASTE", clue: "Spoon juices over roasting meat" },
+      { answer: "GLAZE", clue: "Shiny coating on pastry or meat" }
+    ]
+  },
+  {
+    title: "Ancient World",
+    entries: [
+      { answer: "GIZA", clue: "Site of the Great Pyramid" },
+      { answer: "TOGA", clue: "Roman draped garment" },
+      { answer: "LYRE", clue: "Ancient Greek stringed instrument" },
+      { answer: "AGORA", clue: "Ancient Greek public square" },
+      { answer: "RUIN", clue: "Remnant of ancient structure" },
+      { answer: "ROMAN", clue: "Of the empire that built the Colosseum" }
+    ]
   }
 ];
 

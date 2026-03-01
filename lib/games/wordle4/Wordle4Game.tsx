@@ -35,6 +35,26 @@ const WORD_BANKS: WordBank[] = [
     theme: "Travel",
     targets: ["ROAD", "RAIL", "PORT", "SHIP", "TRIP", "CAMP", "MAPS", "TOUR", "CITY", "COZY"],
     extras: ["BIKE", "TAXI", "LANE", "GATE", "PASS", "STOP", "RIDE", "FUEL"]
+  },
+  {
+    theme: "Olympics",
+    targets: ["GOLD", "LUGE", "POLO", "BOUT", "DOJO", "RINK", "HEAT", "DUEL", "BALK", "PACE"],
+    extras: ["JUMP", "RACE", "SWIM", "DIVE", "LANE", "KICK", "BEAM", "BARS", "SLED", "PUCK"]
+  },
+  {
+    theme: "Music",
+    targets: ["JAZZ", "ARIA", "BASS", "RIFF", "DRUM", "SOLO", "CLEF", "FLAT", "TUNE", "BEAT"],
+    extras: ["NOTE", "REST", "HYMN", "LUTE", "HARP", "FIFE", "GONG", "OBOE", "HORN", "PIPE"]
+  },
+  {
+    theme: "Film",
+    targets: ["NOIR", "REEL", "LENS", "EDIT", "FADE", "CREW", "CULT", "EPIC", "PLOT", "CAST"],
+    extras: ["PROP", "TAKE", "SHOT", "ROLL", "CLIP", "DUPE", "GRIP", "BOOM", "WRAP", "CINE"]
+  },
+  {
+    theme: "Culinary",
+    targets: ["ROUX", "BRIE", "TART", "ZEST", "BAKE", "DICE", "SEAR", "MISO", "CAFE", "WHET"],
+    extras: ["CHEF", "KALE", "TOFU", "FETA", "SAGE", "RIND", "PEEL", "HERB", "FOND", "STIR"]
   }
 ];
 

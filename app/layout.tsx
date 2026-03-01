@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "The Apex",
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-ivory text-charcoal">
         {children}
+        <Analytics />
       </body>
     </html>
   );

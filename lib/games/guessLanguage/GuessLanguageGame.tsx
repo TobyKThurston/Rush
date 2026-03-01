@@ -139,6 +139,132 @@ const ROUND_BANK: LanguageRound[] = [
     phrase: "Dia dhuit, conas ata tu?",
     answer: "Irish",
     options: ["Irish", "Welsh", "Scottish Gaelic", "English"]
+  },
+  {
+    family: "Celtic",
+    phrase: "Bore da, sut mae pethau yn mynd?",
+    answer: "Welsh",
+    options: ["Welsh", "Irish", "Scottish Gaelic", "Breton"]
+  },
+  {
+    family: "Hellenic",
+    phrase: "Καλημέρα, πού είναι η αγορά;",
+    answer: "Greek",
+    options: ["Greek", "Armenian", "Bulgarian", "Serbian"]
+  },
+  {
+    family: "Iranian",
+    phrase: "Salam, hale shoma chetour ast?",
+    answer: "Persian",
+    options: ["Persian", "Arabic", "Urdu", "Turkish"]
+  },
+  {
+    family: "Semitic",
+    phrase: "Shalom, ma shlomcha hayom?",
+    answer: "Hebrew",
+    options: ["Hebrew", "Arabic", "Aramaic", "Maltese"]
+  },
+  {
+    family: "Romance",
+    phrase: "Bon dia, com estàs avui?",
+    answer: "Catalan",
+    options: ["Catalan", "Spanish", "Portuguese", "Occitan"]
+  },
+  {
+    family: "Nordic",
+    phrase: "God morgon, hur mår du idag?",
+    answer: "Swedish",
+    options: ["Swedish", "Norwegian", "Danish", "Finnish"]
+  },
+  {
+    family: "Austronesian",
+    phrase: "Selamat pagi, apa khabar anda?",
+    answer: "Malay",
+    options: ["Malay", "Indonesian", "Tagalog", "Javanese"]
+  },
+  {
+    family: "Polynesian",
+    phrase: "Tēnā koe, kei te pēhea koe?",
+    answer: "Māori",
+    options: ["Māori", "Samoan", "Hawaiian", "Tagalog"]
+  },
+  {
+    family: "Afroasiatic",
+    phrase: "Selam, dehna neh?",
+    answer: "Amharic",
+    options: ["Amharic", "Swahili", "Somali", "Tigrinya"]
+  },
+  {
+    family: "Niger-Congo",
+    phrase: "E kaabo, bawo ni?",
+    answer: "Yoruba",
+    options: ["Yoruba", "Igbo", "Hausa", "Twi"]
+  },
+  {
+    family: "Indo-Aryan",
+    phrase: "Sat sri akal, tussi kithe jaana?",
+    answer: "Punjabi",
+    options: ["Punjabi", "Hindi", "Urdu", "Gujarati"]
+  },
+  {
+    family: "Dravidian",
+    phrase: "Vanakkam, neenga epadi irukeenga?",
+    answer: "Tamil",
+    options: ["Tamil", "Telugu", "Kannada", "Malayalam"]
+  },
+  {
+    family: "Dravidian",
+    phrase: "Namasté, mee ela unnaru?",
+    answer: "Telugu",
+    options: ["Telugu", "Tamil", "Kannada", "Malayalam"]
+  },
+  {
+    family: "Slavic",
+    phrase: "Dobrý den, jak se vám daří?",
+    answer: "Czech",
+    options: ["Czech", "Slovak", "Polish", "Croatian"]
+  },
+  {
+    family: "Romance",
+    phrase: "Bună ziua, cum vă numiți?",
+    answer: "Romanian",
+    options: ["Romanian", "Italian", "French", "Spanish"]
+  },
+  {
+    family: "Turkic",
+    phrase: "Salam, bu gün necə keçir?",
+    answer: "Azerbaijani",
+    options: ["Azerbaijani", "Turkish", "Uzbek", "Kazakh"]
+  },
+  {
+    family: "Kra-Dai",
+    phrase: "Sawatdee, khun sabai dee mai?",
+    answer: "Thai",
+    options: ["Thai", "Lao", "Khmer", "Vietnamese"]
+  },
+  {
+    family: "Austroasiatic",
+    phrase: "Xin chào, hôm nay bạn có khỏe không?",
+    answer: "Vietnamese",
+    options: ["Vietnamese", "Thai", "Khmer", "Lao"]
+  },
+  {
+    family: "Kartvelian",
+    phrase: "Gamarjoba, rogor khar?",
+    answer: "Georgian",
+    options: ["Georgian", "Armenian", "Azerbaijani", "Russian"]
+  },
+  {
+    family: "Romance",
+    phrase: "La vita è bella quando si mangia bene.",
+    answer: "Italian",
+    options: ["Italian", "Spanish", "Romanian", "French"]
+  },
+  {
+    family: "Japonic",
+    phrase: "Ikigai wa mainichi no yorokobi ni aru.",
+    answer: "Japanese",
+    options: ["Japanese", "Korean", "Mandarin Chinese", "Cantonese"]
   }
 ];
 
