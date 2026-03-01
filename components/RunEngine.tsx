@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import type { GameEventPayload, RushGame } from "@/types/Game";
 import SunriseCountdown from "./SunriseCountdown";
 
@@ -68,7 +67,11 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
   const pendingAdvance = useRef<{ stageIndex: number } | null>(null);
   const advanceGuard = useRef(false);
   const completionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const router = useRouter();
+
+  // Tracks the current game instance so stale callbacks from unmounted
+  // game components (pending setTimeouts) can be detected and ignored.
+  const gameInstanceRef = useRef(gameInstance);
+  gameInstanceRef.current = gameInstance;
 
   const persistProgress = useCallback(
     (payload: {
@@ -151,7 +154,13 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       const restoredSequence = parsed.sequenceIds
         .map((id) => gameLookup.get(id))
         .filter((game): game is RushGame => Boolean(game));
-      if (restoredSequence.length === 0) return;
+
+      // If any saved game is no longer available (e.g. removed from dailyGames),
+      // the saved run is stale — discard it rather than restoring a broken sequence.
+      if (restoredSequence.length !== parsed.sequenceIds.length || restoredSequence.length === 0) {
+        clearProgress();
+        return;
+      }
 
       setSequence(restoredSequence);
       setPhase("playing");
@@ -174,9 +183,12 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     } catch {
       // Ignore restore errors.
     }
-  }, [phase, games]);
+  }, [phase, games, clearProgress]);
 
   const startRun = useCallback(() => {
+    // Clear any saved progress so a fresh run always starts clean.
+    clearProgress();
+
     const selection: RushGame[] = [];
     const shuffled = [...games];
     for (let i = 0; i < (stageCount || 1); i += 1) {
@@ -184,6 +196,13 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         shuffled.sort(() => Math.random() - 0.5);
       }
       selection.push(shuffled[i % shuffled.length]);
+    }
+
+    pendingAdvance.current = null;
+    advanceGuard.current = false;
+    if (completionTimer.current) {
+      clearTimeout(completionTimer.current);
+      completionTimer.current = null;
     }
 
     setSequence(selection);
@@ -197,11 +216,8 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     setShareNote(null);
     setRunFailed(false);
     setPenaltyCount(0);
-    advanceGuard.current = false;
-    if (completionTimer.current) {
-      clearTimeout(completionTimer.current);
-      completionTimer.current = null;
-    }
+    setSuccessOverlay(null);
+
     persistProgress({
       phase: "playing",
       sequenceIds: selection.map((game) => game.id),
@@ -210,7 +226,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       timeElapsed: 0,
       notes: []
     });
-  }, [games, stageCount, persistProgress]);
+  }, [games, stageCount, persistProgress, clearProgress]);
 
   useEffect(() => {
     if (phase !== "playing") return;
@@ -243,8 +259,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
           currentIndex: stageIndexValue,
           totalStages: stageCount || 1,
           nextIndex,
-          isFinalStage,
-          nextRoute: "/run"
+          isFinalStage
         });
       }
 
@@ -253,7 +268,6 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         if (isFinalStage) {
           setPhase("finished");
           clearProgress();
-          router.replace("/run");
           return;
         }
         setCurrentIndex(nextIndex);
@@ -267,10 +281,9 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
           timeElapsed,
           notes
         });
-        router.replace("/run");
       }, 220);
     },
-    [clearProgress, notes, persistProgress, router, score, sequence, stageCount, timeElapsed]
+    [clearProgress, notes, persistProgress, score, sequence, stageCount, timeElapsed]
   );
 
   const resolveStage = useCallback(
@@ -312,14 +325,25 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     [phase, currentGame, currentIndex, stageCount, advanceToNextGame, clearProgress]
   );
 
-  const handlers = useMemo(
-    () => ({
-      onSuccess: (payload?: GameEventPayload) => resolveStage("success", payload),
-      onFail: (payload?: GameEventPayload) => resolveStage("fail", payload),
-      onComplete: (payload?: GameEventPayload) => resolveStage("complete", payload)
-    }),
-    [resolveStage]
-  );
+  // Wrap handlers with a game-instance capture so stale callbacks from
+  // unmounted game components (pending setTimeouts) are silently dropped.
+  const handlers = useMemo(() => {
+    const capturedInstance = gameInstance;
+    return {
+      onSuccess: (payload?: GameEventPayload) => {
+        if (capturedInstance !== gameInstanceRef.current) return;
+        resolveStage("success", payload);
+      },
+      onFail: (payload?: GameEventPayload) => {
+        if (capturedInstance !== gameInstanceRef.current) return;
+        resolveStage("fail", payload);
+      },
+      onComplete: (payload?: GameEventPayload) => {
+        if (capturedInstance !== gameInstanceRef.current) return;
+        resolveStage("complete", payload);
+      },
+    };
+  }, [resolveStage, gameInstance]);
 
   const acknowledgeSuccess = useCallback(() => {
     if (!pendingAdvance.current) return;
