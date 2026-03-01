@@ -405,10 +405,10 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         {!runFailed && (
           <button
             onClick={async () => {
-              const payload = `Completed THE APEX in ${formattedTime}.`;
+              const payload = `Completed THE APEX in ${formattedTime}.\n\nhttps://enterapex.xyz`;
               try {
                 if (navigator.share) {
-                  await navigator.share({ title: "The Apex", text: payload });
+                  await navigator.share({ title: "The Apex", text: payload, url: "https://enterapex.xyz" });
                   setShareNote("Shared.");
                   return;
                 }
