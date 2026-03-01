@@ -401,6 +401,9 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
           <p className="text-sm text-charcoal/60">
             {runFailed ? "Run interrupted." : "Daily run complete."}
           </p>
+          <p className="text-xs text-charcoal/50">
+            {penaltyCount === 0 ? "No incorrect answers" : `${penaltyCount} incorrect`}
+          </p>
         </div>
         {!runFailed && (
           <button
