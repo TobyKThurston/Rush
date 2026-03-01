@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -22,21 +23,12 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
   const pointerRef = useRef<number | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const announcedRef = useRef(false);
-
-  // Prevent iOS Safari from hijacking the touch as a scroll gesture
-  useEffect(() => {
-    const el = gridRef.current;
-    if (!el) return;
-    const prevent = (e: TouchEvent) => e.preventDefault();
-    el.addEventListener("touchstart", prevent, { passive: false });
-    el.addEventListener("touchmove", prevent, { passive: false });
-    return () => {
-      el.removeEventListener("touchstart", prevent);
-      el.removeEventListener("touchmove", prevent);
-    };
-  }, []);
   const [shakeKey, setShakeKey] = useState<string | null>(null);
   const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Keep latest visit in a ref so the touch effect closure always calls the current version
+  const visitRef = useRef(visit);
+  visitRef.current = visit;
 
   const activeKey = snapshot.path.length ? keyOf(snapshot.path[snapshot.path.length - 1]) : null;
   const polylinePoints = snapshot.path
@@ -53,31 +45,71 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
     }
   }, [snapshot.status, snapshot.hasBacktracked, onSuccess, size, status?.timeLeft]);
 
-  const triggerShake = (key: string) => {
+  const triggerShake = useCallback((key: string) => {
     setShakeKey(key);
     if (shakeTimeoutRef.current) clearTimeout(shakeTimeoutRef.current);
     shakeTimeoutRef.current = setTimeout(() => {
       setShakeKey((current) => (current === key ? null : current));
     }, 220);
-  };
+  }, []);
 
   useEffect(() => {
     return () => {
-      if (shakeTimeoutRef.current) {
-        clearTimeout(shakeTimeoutRef.current);
-      }
+      if (shakeTimeoutRef.current) clearTimeout(shakeTimeoutRef.current);
     };
   }, []);
 
+  // Native touch events for iOS Safari — React synthetic events can't reliably
+  // prevent scroll and process drag simultaneously on mobile.
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+
+    const cellFromTouch = (touch: Touch): { row: number; col: number } | null => {
+      const rect = el.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
+      return {
+        col: Math.min(size - 1, Math.max(0, Math.floor((x / rect.width) * size))),
+        row: Math.min(size - 1, Math.max(0, Math.floor((y / rect.height) * size))),
+      };
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (!touch) return;
+      const cell = cellFromTouch(touch);
+      if (cell) visitRef.current(cell);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (!touch) return;
+      const cell = cellFromTouch(touch);
+      if (!cell) return;
+      const result = visitRef.current(cell);
+      if (result?.invalidKey) triggerShake(result.invalidKey);
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: false });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+    };
+  }, [size, triggerShake]);
+
+  // Pointer events for desktop mouse drag
   const positionToCell = (event: PointerEvent, element: HTMLDivElement) => {
     const rect = element.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
-    const cellWidth = rect.width / size;
-    const cellHeight = rect.height / size;
-    const col = Math.min(size - 1, Math.max(0, Math.floor(x / cellWidth)));
-    const row = Math.min(size - 1, Math.max(0, Math.floor(y / cellHeight)));
+    const col = Math.min(size - 1, Math.max(0, Math.floor((x / rect.width) * size)));
+    const row = Math.min(size - 1, Math.max(0, Math.floor((y / rect.height) * size)));
     return { row, col };
   };
 
@@ -86,12 +118,11 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
     const cell = positionToCell(event.nativeEvent, gridRef.current);
     if (!cell) return;
     const result = visit(cell);
-    if (result?.invalidKey) {
-      triggerShake(result.invalidKey);
-    }
+    if (result?.invalidKey) triggerShake(result.invalidKey);
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return; // handled natively above
     event.preventDefault();
     gridRef.current?.setPointerCapture(event.pointerId);
     pointerRef.current = event.pointerId;
@@ -99,12 +130,14 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
     if (pointerRef.current !== event.pointerId) return;
     event.preventDefault();
     processPointer(event);
   };
 
   const releasePointer = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
     if (pointerRef.current === event.pointerId) {
       pointerRef.current = null;
       if (gridRef.current?.hasPointerCapture(event.pointerId)) {
