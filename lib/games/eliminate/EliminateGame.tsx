@@ -3,14 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import type { GameProps } from "@/types/Game";
 import { calculateRoundScore, createEliminateSession, TOTAL_ELIMINATE_ROUNDS } from "./EliminateLogic";
+import { seededRng } from "@/lib/daily/seed";
 
 const fadeDuration = 180;
 
-const EliminateGame = ({ onSuccess, onFail }: GameProps) => {
+const EliminateGame = ({ onSuccess, onFail, seed }: GameProps) => {
   const puzzles = useMemo(() => {
+    if (seed !== undefined) {
+      const rng = seededRng(seed);
+      const difficulty = (Math.floor(rng() * 3) + 1) as 1 | 2 | 3;
+      return createEliminateSession(TOTAL_ELIMINATE_ROUNDS, difficulty, rng);
+    }
     const difficulty = (Math.floor(Math.random() * 3) + 1) as 1 | 2 | 3;
     return createEliminateSession(TOTAL_ELIMINATE_ROUNDS, difficulty);
-  }, []);
+  }, [seed]);
   const [roundIndex, setRoundIndex] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
   const [totalScore, setTotalScore] = useState(0);

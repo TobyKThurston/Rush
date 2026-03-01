@@ -17,6 +17,7 @@ export interface GameProps {
   onFail: (payload?: GameEventPayload) => void;
   onComplete: (payload?: GameEventPayload) => void;
   status?: GameStatusContext;
+  seed?: number;
 }
 
 export interface ApexGame {

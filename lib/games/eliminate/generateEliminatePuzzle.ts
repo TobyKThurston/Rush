@@ -9,25 +9,25 @@ export type EliminatePuzzle = {
   mode: "Category" | "Property" | "Sequence";
 };
 
-const pickRandom = <T>(items: readonly T[]): T => items[Math.floor(Math.random() * items.length)];
+const pickRandom = <T>(items: readonly T[], rng: () => number): T => items[Math.floor(rng() * items.length)];
 
-const shuffle = <T>(array: readonly T[]): T[] => {
+const shuffle = <T>(array: readonly T[], rng: () => number): T[] => {
   const clone = [...array];
   for (let i = clone.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [clone[i], clone[j]] = [clone[j], clone[i]];
   }
   return clone;
 };
 
-const buildCategoryPuzzle = (): EliminatePuzzle => {
-  const category = pickRandom(eliminateCategories);
-  const items = shuffle(category.pool).slice(0, 5);
-  let intruder = pickRandom(category.intruders);
+const buildCategoryPuzzle = (rng: () => number): EliminatePuzzle => {
+  const category = pickRandom(eliminateCategories, rng);
+  const items = shuffle(category.pool, rng).slice(0, 5);
+  let intruder = pickRandom(category.intruders, rng);
   while (items.includes(intruder)) {
-    intruder = pickRandom(category.intruders);
+    intruder = pickRandom(category.intruders, rng);
   }
-  const finalItems = shuffle([...items, intruder]);
+  const finalItems = shuffle([...items, intruder], rng);
   const correctIndex = finalItems.indexOf(intruder);
   return {
     items: finalItems,
@@ -37,14 +37,14 @@ const buildCategoryPuzzle = (): EliminatePuzzle => {
   };
 };
 
-const buildPropertyPuzzle = (): EliminatePuzzle => {
-  const rule = pickRandom(propertyRules);
-  const validItems = shuffle(rule.correctPool).slice(0, 5);
-  let intruder = pickRandom(rule.intruderPool);
+const buildPropertyPuzzle = (rng: () => number): EliminatePuzzle => {
+  const rule = pickRandom(propertyRules, rng);
+  const validItems = shuffle(rule.correctPool, rng).slice(0, 5);
+  let intruder = pickRandom(rule.intruderPool, rng);
   while (validItems.includes(intruder)) {
-    intruder = pickRandom(rule.intruderPool);
+    intruder = pickRandom(rule.intruderPool, rng);
   }
-  const finalItems = shuffle([...validItems, intruder]);
+  const finalItems = shuffle([...validItems, intruder], rng);
   return {
     items: finalItems,
     correctIndex: finalItems.indexOf(intruder),
@@ -96,11 +96,11 @@ const SEQUENCE_RULES = [
   }
 ] as const;
 
-const buildSequencePuzzle = (): EliminatePuzzle => {
-  const rule = pickRandom(SEQUENCE_RULES);
-  const validItems = shuffle(rule.valid).slice(0, 5);
-  const intruder = pickRandom(rule.intruders);
-  const finalItems = shuffle([...validItems, intruder]);
+const buildSequencePuzzle = (rng: () => number): EliminatePuzzle => {
+  const rule = pickRandom(SEQUENCE_RULES, rng);
+  const validItems = shuffle(rule.valid, rng).slice(0, 5);
+  const intruder = pickRandom(rule.intruders, rng);
+  const finalItems = shuffle([...validItems, intruder], rng);
   return {
     items: finalItems,
     correctIndex: finalItems.indexOf(intruder),
@@ -109,14 +109,17 @@ const buildSequencePuzzle = (): EliminatePuzzle => {
   };
 };
 
-export const generateEliminatePuzzle = (difficulty: EliminateDifficulty = 2): EliminatePuzzle => {
+export const generateEliminatePuzzle = (
+  difficulty: EliminateDifficulty = 2,
+  rng: () => number = Math.random
+): EliminatePuzzle => {
   if (difficulty === 1) {
-    return buildCategoryPuzzle();
+    return buildCategoryPuzzle(rng);
   }
   if (difficulty === 3) {
     const hardBuilders = [buildPropertyPuzzle, buildSequencePuzzle];
-    return pickRandom(hardBuilders)();
+    return pickRandom(hardBuilders, rng)(rng);
   }
   const mixedBuilders = [buildCategoryPuzzle, buildPropertyPuzzle, buildSequencePuzzle];
-  return pickRandom(mixedBuilders)();
+  return pickRandom(mixedBuilders, rng)(rng);
 };

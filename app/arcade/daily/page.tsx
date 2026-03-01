@@ -5,9 +5,9 @@ import { dailyGames } from "@/lib/games";
 import FixedHeader from "@/components/FixedHeader";
 import CenteredStageLayout from "@/components/CenteredStageLayout";
 
-const RunPage = () => {
+const ArcadeDailyPage = () => {
   return (
-    <RunEngine games={dailyGames} mode="daily">
+    <RunEngine games={dailyGames} mode="practice-daily">
       {({ phase, currentIndex, totalStages, timeElapsed, penaltyCount, stageNode, successOverlay, acknowledgeSuccess }) => (
         <>
           <FixedHeader
@@ -18,7 +18,7 @@ const RunPage = () => {
             penaltyCount={penaltyCount}
           />
           <CenteredStageLayout>
-            <GameStage className={successOverlay ? "bg-[#f7f3ed]" : ""}>
+            <GameStage label="Daily Practice" className={successOverlay ? "bg-[#f7f3ed]" : ""}>
               {phase === "playing" ? (
                 <div className="relative h-full">
                   <div
@@ -45,4 +45,4 @@ const RunPage = () => {
   );
 };
 
-export default RunPage;
+export default ArcadeDailyPage;

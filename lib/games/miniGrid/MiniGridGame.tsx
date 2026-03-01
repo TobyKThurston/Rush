@@ -3,16 +3,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GameProps } from "@/types/Game";
 import { miniGridPuzzles, type MiniGridPuzzle } from "./data";
+import { seededRng } from "@/lib/daily/seed";
 
 const BASE_SCORE = 50;
 const TIME_PENALTY = 5;
 const DEBUG_MINI = process.env.NEXT_PUBLIC_APEX_DEBUG === "1";
 
-const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
-  const puzzle = useMemo<MiniGridPuzzle>(
-    () => miniGridPuzzles[Math.floor(Math.random() * miniGridPuzzles.length)],
-    []
-  );
+const MiniGridGame = ({ onSuccess, onFail, seed }: GameProps) => {
+  const puzzle = useMemo<MiniGridPuzzle>(() => {
+    const rng = seed !== undefined ? seededRng(seed) : Math.random;
+    return miniGridPuzzles[Math.floor(rng() * miniGridPuzzles.length)];
+  }, [seed]);
   const [entries, setEntries] = useState<(string | null)[][]>(
     () => puzzle.grid.map((row) => row.map((cell) => (cell ? "" : null)))
   );

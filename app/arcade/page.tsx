@@ -25,18 +25,37 @@ const ArcadePage = () => {
           </p>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {curatedTiles.map((game) => (
-            <Link
-              key={game.id}
-              href={`/arcade/${game.id}`}
-              className="group relative flex aspect-square items-center justify-center rounded-[26px] border border-white/70 bg-white/60 text-center transition-all duration-200 ease-gentle hover:-translate-y-1 hover:border-rosegold/60 hover:shadow-veil"
-            >
-              <span className="font-serif text-2xl tracking-[0.25em] text-charcoal group-hover:text-rosegold">
-                {game.name}
-              </span>
-            </Link>
-          ))}
+        {/* Today's Daily — same puzzles as the daily run, unlimited replays */}
+        <div>
+          <p className="mb-4 text-xs uppercase tracking-[0.4em] text-warmGrey/80">Featured</p>
+          <Link
+            href="/arcade/daily"
+            className="group flex flex-col items-center justify-center gap-3 rounded-[26px] border border-rosegold/40 bg-white/60 px-8 py-10 text-center transition-all duration-200 ease-gentle hover:-translate-y-1 hover:border-rosegold/70 hover:shadow-veil"
+          >
+            <span className="font-serif text-2xl tracking-[0.25em] text-charcoal group-hover:text-rosegold">
+              Today&apos;s Daily
+            </span>
+            <span className="text-xs uppercase tracking-[0.35em] text-warmGrey/70">
+              Practice today&apos;s run · unlimited plays
+            </span>
+          </Link>
+        </div>
+
+        <div>
+          <p className="mb-6 text-xs uppercase tracking-[0.4em] text-warmGrey/80">All Games</p>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {curatedTiles.map((game) => (
+              <Link
+                key={game.id}
+                href={`/arcade/${game.id}`}
+                className="group relative flex aspect-square items-center justify-center rounded-[26px] border border-white/70 bg-white/60 text-center transition-all duration-200 ease-gentle hover:-translate-y-1 hover:border-rosegold/60 hover:shadow-veil"
+              >
+                <span className="font-serif text-2xl tracking-[0.25em] text-charcoal group-hover:text-rosegold">
+                  {game.name}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </main>

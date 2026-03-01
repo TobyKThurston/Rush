@@ -10,14 +10,24 @@ import {
 } from "react";
 import type { GameProps } from "@/types/Game";
 import { generateZipPuzzle, type ZipPuzzleDifficulty } from "./generatePuzzle";
+import { seededRng } from "@/lib/daily/seed";
 import { useZipPuzzleEngine, type ZipPuzzlePoint } from "./ZipPuzzleLogic";
 
 const keyOf = (point: ZipPuzzlePoint) => `${point.row}-${point.col}`;
 const DIFFICULTIES: ZipPuzzleDifficulty[] = ["calm", "balanced", "bold"];
 
-const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
-  const difficulty = useMemo(() => DIFFICULTIES[Math.floor(Math.random() * DIFFICULTIES.length)], []);
-  const puzzle = useMemo(() => generateZipPuzzle({ difficulty }), [difficulty]);
+const ZipPuzzleGame = ({ onSuccess, status, seed }: GameProps) => {
+  const difficulty = useMemo(() => {
+    const rng = seed !== undefined ? seededRng(seed) : Math.random;
+    return DIFFICULTIES[Math.floor(rng() * DIFFICULTIES.length)];
+  }, [seed]);
+  const puzzle = useMemo(() => {
+    if (seed !== undefined) {
+      const rng = seededRng(seed + 1);
+      return generateZipPuzzle({ difficulty, rng });
+    }
+    return generateZipPuzzle({ difficulty });
+  }, [difficulty, seed]);
   const { size, anchors, snapshot, visit, undo } = useZipPuzzleEngine(puzzle);
   const anchorMap = useMemo(() => new Map(anchors.map((anchor) => [keyOf(anchor), anchor])), [anchors]);
   const pointerRef = useRef<number | null>(null);

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { GameProps } from "@/types/Game";
+import { seededRng, seededShuffle } from "@/lib/daily/seed";
 
 type DifficultyLabel = "Easy" | "Medium" | "Decently Hard";
 
@@ -146,8 +147,16 @@ const shuffle = <T,>(items: T[]) => {
   return next;
 };
 
-const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
-  const rounds = useMemo(() => shuffle([...ROUND_POOL]).slice(0, 3).map((round) => ({ ...round, options: shuffle(round.options) })), []);
+const SequenceGame = ({ onSuccess, onFail, seed }: GameProps) => {
+  const rounds = useMemo(() => {
+    if (seed !== undefined) {
+      const rng = seededRng(seed);
+      return seededShuffle([...ROUND_POOL], rng)
+        .slice(0, 3)
+        .map((round) => ({ ...round, options: seededShuffle([...round.options], rng) }));
+    }
+    return shuffle([...ROUND_POOL]).slice(0, 3).map((round) => ({ ...round, options: shuffle(round.options) }));
+  }, [seed]);
   const [roundIndex, setRoundIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [locked, setLocked] = useState(false);

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { GameProps } from "@/types/Game";
+import { seededRng } from "@/lib/daily/seed";
 
 type PulseResult = "Perfect" | "Great" | "Good" | "Miss";
 type PulseStyle = "Sine" | "Triangle" | "Drift";
@@ -22,7 +23,7 @@ const triangleWave = (phase: number) => {
   return 2 - scaled;
 };
 
-const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
+const TimingGame = ({ onSuccess, onFail, status, seed }: GameProps) => {
   const [progress, setProgress] = useState(50);
   const [result, setResult] = useState<PulseResult | null>(null);
   const [awardedScore, setAwardedScore] = useState<number | null>(null);
@@ -34,18 +35,19 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
 
   const isArcade = !status;
 
-  const roundConfigs = useMemo(() =>
-    Array.from({ length: TOTAL_ROUNDS }, () => {
-      const styles: PulseStyle[] = ["Sine", "Triangle", "Drift"];
-      const style = styles[Math.floor(Math.random() * styles.length)];
-      const speed = isArcade ? 0.05 + Math.random() * 0.05 : 0.12 + Math.random() * 0.1;
-      const width = 8 + Math.random() * 10;
-      const center = 20 + Math.random() * 60;
+  const roundConfigs = useMemo(() => {
+    const rng = seed !== undefined ? seededRng(seed) : Math.random;
+    const styles: PulseStyle[] = ["Sine", "Triangle", "Drift"];
+    return Array.from({ length: TOTAL_ROUNDS }, () => {
+      const style = styles[Math.floor(rng() * styles.length)];
+      const speed = isArcade ? 0.05 + rng() * 0.05 : 0.12 + rng() * 0.1;
+      const width = 8 + rng() * 10;
+      const center = 20 + rng() * 60;
       const zoneStart = Math.max(4, center - width / 2);
       const zoneEnd = Math.min(96, zoneStart + width);
       return { style, speed, zone: { start: zoneStart, end: zoneEnd } };
-    }), [isArcade]
-  );
+    });
+  }, [isArcade, seed]);
 
   const { style, speed, zone } = roundConfigs[round];
 

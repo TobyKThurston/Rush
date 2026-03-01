@@ -43,12 +43,13 @@ const buildAnchors = (path: ZipPuzzlePoint[], steps: number[]): ZipAnchor[] =>
     return { row: point.row, col: point.col, value: index + 1 };
   });
 
-export const generateZipPuzzle = (options?: { difficulty?: ZipPuzzleDifficulty }): ZipPuzzleData => {
+export const generateZipPuzzle = (options?: { difficulty?: ZipPuzzleDifficulty; rng?: () => number }): ZipPuzzleData => {
   const difficulty = options?.difficulty ?? "balanced";
+  const rng = options?.rng ?? Math.random;
   const pool = selectTemplates(difficulty);
-  const template = pool[Math.floor(Math.random() * pool.length)];
-  const rotation = Math.floor(Math.random() * 4);
-  const mirror = Math.random() > 0.5;
+  const template = pool[Math.floor(rng() * pool.length)];
+  const rotation = Math.floor(rng() * 4);
+  const mirror = rng() > 0.5;
   const transformedPath = template.path.map((point) => transformPoint(point, template.size, rotation, mirror));
   const anchors = buildAnchors(transformedPath, template.anchorSteps);
   return {

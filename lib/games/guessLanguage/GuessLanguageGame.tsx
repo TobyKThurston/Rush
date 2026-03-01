@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { GameProps } from "@/types/Game";
+import { seededRng, seededShuffle } from "@/lib/daily/seed";
 
 type LanguageRound = {
   family: string;
@@ -277,12 +278,18 @@ const shuffle = <T,>(items: T[]): T[] => {
   return next;
 };
 
-const GuessLanguageGame = ({ onSuccess, onFail }: GameProps) => {
+const GuessLanguageGame = ({ onSuccess, onFail, seed }: GameProps) => {
   const rounds = useMemo(() => {
+    if (seed !== undefined) {
+      const rng = seededRng(seed);
+      return seededShuffle(ROUND_BANK, rng)
+        .slice(0, TOTAL_ROUNDS)
+        .map((round) => ({ ...round, options: seededShuffle([...round.options], rng) }));
+    }
     return shuffle(ROUND_BANK)
       .slice(0, TOTAL_ROUNDS)
       .map((round) => ({ ...round, options: shuffle(round.options) }));
-  }, []);
+  }, [seed]);
   const [roundIndex, setRoundIndex] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [selected, setSelected] = useState<{ index: number; correct: boolean } | null>(null);
