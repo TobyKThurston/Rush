@@ -202,7 +202,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, mode = "free", c
 
       // Restore daily seed for seeded modes
       if (mode !== "free") {
-        setActiveDailySeed(getDailySeed());
+        setActiveDailySeed(mode === "practice-daily" ? getDailySeed() + 100000 : getDailySeed());
       }
 
       if (DEBUG_APEX) {
@@ -226,7 +226,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, mode = "free", c
 
     let selection: ApexGame[];
     if (mode !== "free") {
-      const seed = getDailySeed();
+      const seed = mode === "practice-daily" ? getDailySeed() + 100000 : getDailySeed();
       setActiveDailySeed(seed);
       selection = seededShuffle([...games], seededRng(seed)).slice(0, stageCount || 1);
     } else {
