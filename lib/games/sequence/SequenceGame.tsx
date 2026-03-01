@@ -4,10 +4,8 @@ import { useMemo, useState } from "react";
 import type { GameProps } from "@/types/Game";
 
 type DifficultyLabel = "Easy" | "Medium" | "Decently Hard";
-type SequenceMode = "Arithmetic" | "Triangular" | "Fibonacci" | "Powers" | "Alternating" | "Squares";
 
 type SequenceRound = {
-  mode: SequenceMode;
   difficulty: DifficultyLabel;
   sequence: number[];
   missingIndex: number;
@@ -18,57 +16,27 @@ type SequenceRound = {
 
 const ROUNDS: SequenceRound[] = [
   {
-    mode: "Arithmetic",
     difficulty: "Easy",
     sequence: [2, 4, 6, 8, 10],
     missingIndex: 3,
     answer: 8,
-    options: [6, 7, 8, 9],
+    options: [7, 8, 9],
     points: 35
   },
   {
-    mode: "Triangular",
     difficulty: "Medium",
     sequence: [3, 6, 10, 15, 21],
     missingIndex: 4,
     answer: 21,
-    options: [20, 21, 22, 24],
+    options: [20, 21, 24],
     points: 45
   },
   {
-    mode: "Alternating",
     difficulty: "Decently Hard",
     sequence: [7, 11, 18, 29, 47],
     missingIndex: 2,
     answer: 18,
-    options: [16, 17, 18, 21],
-    points: 60
-  },
-  {
-    mode: "Fibonacci",
-    difficulty: "Medium",
-    sequence: [2, 3, 5, 8, 13],
-    missingIndex: 3,
-    answer: 8,
-    options: [7, 8, 9, 10],
-    points: 45
-  },
-  {
-    mode: "Powers",
-    difficulty: "Decently Hard",
-    sequence: [2, 4, 8, 16, 32],
-    missingIndex: 2,
-    answer: 8,
-    options: [6, 7, 8, 9],
-    points: 60
-  },
-  {
-    mode: "Squares",
-    difficulty: "Decently Hard",
-    sequence: [1, 4, 9, 16, 25],
-    missingIndex: 3,
-    answer: 16,
-    options: [14, 15, 16, 18],
+    options: [17, 18, 21],
     points: 60
   }
 ];
@@ -83,10 +51,7 @@ const shuffle = <T,>(items: T[]) => {
 };
 
 const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
-  const rounds = useMemo(
-    () => shuffle(ROUNDS).slice(0, 2).map((round) => ({ ...round, options: shuffle(round.options) })),
-    []
-  );
+  const rounds = useMemo(() => ROUNDS.map((round) => ({ ...round, options: shuffle(round.options) })), []);
   const [roundIndex, setRoundIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [locked, setLocked] = useState(false);
@@ -127,22 +92,21 @@ const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
 
   return (
     <div className="flex h-full flex-col justify-center">
-      <div className="mb-8 text-center">
+      <div className="mb-3 sm:mb-8 text-center">
         <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">
           Sequence - Round {roundIndex + 1} of {rounds.length}
         </p>
-        <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">{currentRound.mode}</p>
-        <p className="mt-2 text-xs uppercase tracking-[0.28em] text-charcoal/65">{currentRound.difficulty}</p>
-        <div className="mt-5 flex flex-wrap justify-center gap-6 font-serif text-3xl text-charcoal">
+        <p className="mt-1 sm:mt-2 text-[10px] sm:text-xs uppercase tracking-[0.28em] text-charcoal/65">{currentRound.difficulty}</p>
+        <div className="mt-3 sm:mt-5 flex flex-wrap justify-center gap-4 sm:gap-6 font-serif text-xl sm:text-3xl text-charcoal">
           {currentRound.sequence.map((value, index) => (
-            <span key={`${currentRound.mode}-${index}`} className="min-w-[2ch] text-center">
+            <span key={`${currentRound.sequence.join("-")}-${index}`} className="min-w-[2ch] text-center">
               {index === currentRound.missingIndex ? "?" : value.toString()}
             </span>
           ))}
         </div>
       </div>
 
-      <div className="mx-auto grid w-full max-w-xl gap-4">
+      <div className="mx-auto grid w-full max-w-xl gap-2 sm:gap-4">
         {currentRound.options.map((option, index) => {
           const isSelected = selected === index;
           const isCorrectChoice = option === currentRound.answer;
@@ -157,7 +121,7 @@ const SequenceGame = ({ onSuccess, onFail }: GameProps) => {
               key={`${currentRound.sequence.join("-")}-${option}`}
               type="button"
               onClick={() => handleChoice(option, index)}
-              className={`rounded-[16px] border px-4 py-5 font-serif text-2xl text-charcoal transition-all duration-200 ease-gentle ${tone}`}
+              className={`rounded-[16px] border px-4 py-3 sm:py-5 font-serif text-lg sm:text-2xl text-charcoal transition-all duration-200 ease-gentle ${tone}`}
             >
               {option}
             </button>

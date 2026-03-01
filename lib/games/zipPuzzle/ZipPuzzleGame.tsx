@@ -22,6 +22,19 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
   const pointerRef = useRef<number | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const announcedRef = useRef(false);
+
+  // Prevent iOS Safari from hijacking the touch as a scroll gesture
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const prevent = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener("touchstart", prevent, { passive: false });
+    el.addEventListener("touchmove", prevent, { passive: false });
+    return () => {
+      el.removeEventListener("touchstart", prevent);
+      el.removeEventListener("touchmove", prevent);
+    };
+  }, []);
   const [shakeKey, setShakeKey] = useState<string | null>(null);
   const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -103,13 +116,13 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
   const gridDimension = Math.min(570, size * 88);
 
   return (
-    <div className="flex h-full flex-col gap-6">
+    <div className="flex h-full flex-col gap-2 sm:gap-6">
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.35em] text-warmGrey">Zip Puzzle</p>
-        <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">
+        <p className="mt-1 sm:mt-2 text-[10px] uppercase tracking-[0.3em] text-charcoal/55">
           {difficulty} mode • {size}x{size}
         </p>
-        <p className="mt-2 text-sm text-charcoal/70">Glide through every anchor with a single composed line.</p>
+        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-charcoal/70">Glide through every anchor with a single composed line.</p>
       </div>
       <div className="flex justify-center">
         <button
@@ -125,7 +138,7 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
           className="relative aspect-square w-full max-h-full select-none"
           style={{ maxWidth: `${gridDimension}px` }}
         >
-          <div className="absolute inset-0 rounded-[28px] bg-ivory/80 p-4 shadow-inner">
+          <div className="absolute inset-0 rounded-[28px] bg-ivory/80 p-2 sm:p-4 shadow-inner">
             <div
               ref={gridRef}
               className="relative h-full w-full touch-none"

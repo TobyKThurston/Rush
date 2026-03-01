@@ -22,6 +22,18 @@ body {
   background-color: #F8F6F2;
 }
 
+/* Game stage: tall rectangle on mobile, square on sm+ */
+.game-stage-inner {
+  height: calc(100dvh - 84px - env(safe-area-inset-top, 0px) - 1rem);
+}
+
+@media (min-width: 640px) {
+  .game-stage-inner {
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+}
+
 .section-shell {
   @apply rounded-[24px] bg-white/70 backdrop-blur-sm shadow-veil border border-white/60;
 }

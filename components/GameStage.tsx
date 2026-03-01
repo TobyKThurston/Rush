@@ -8,17 +8,17 @@ type GameStageProps = {
 
 const GameStage = ({ children, className, label }: GameStageProps) => {
   return (
-    <div className="w-full max-w-[720px] max-h-[calc(100dvh-var(--header-h,84px)-2rem)]">
+    <div className="w-full max-w-[720px]">
       {label && (
-        <p className="mb-4 text-center text-sm uppercase tracking-[0.4em] text-warmGrey/80">{label}</p>
+        <p className="mb-3 sm:mb-4 text-center text-xs sm:text-sm uppercase tracking-[0.4em] text-warmGrey/80">{label}</p>
       )}
       <div
-        className={`relative aspect-square w-full overflow-hidden rounded-[40px] border border-white/70 bg-[#F3EEE5] shadow-veil transition-all duration-200 ease-gentle ${
+        className={`game-stage-inner relative w-full overflow-hidden rounded-[40px] border border-white/70 bg-[#F3EEE5] shadow-veil transition-all duration-200 ease-gentle ${
           className ?? ""
         }`}
       >
-        <div className="absolute inset-0 p-5 sm:p-7">
-          <div className="h-full w-full rounded-[32px] bg-white/35 p-4 sm:p-5">
+        <div className="absolute inset-0 p-3 sm:p-7">
+          <div className="h-full w-full rounded-[32px] bg-white/35 p-2 sm:p-5">
             {children}
           </div>
         </div>

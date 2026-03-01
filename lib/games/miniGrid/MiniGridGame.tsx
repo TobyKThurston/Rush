@@ -289,12 +289,12 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   };
 
   return (
-    <div className="flex h-full flex-col gap-5 text-charcoal">
+    <div className="flex h-full flex-col gap-3 sm:gap-5 text-charcoal">
       <div className="text-center">
         <p className="text-[10px] uppercase tracking-[0.35em] text-warmGrey">Mini Grid</p>
-        <p className="mt-2 text-xs uppercase tracking-[0.32em] text-charcoal/55">{puzzle.title} Crossword</p>
+        <p className="mt-1 sm:mt-2 text-[10px] sm:text-xs uppercase tracking-[0.32em] text-charcoal/55">{puzzle.title} Crossword</p>
       </div>
-      <div className="grid grid-cols-2 gap-4 overflow-y-auto text-xs uppercase tracking-[0.35em] text-warmGrey">
+      <div className="grid grid-cols-2 gap-2 sm:gap-8 text-xs uppercase tracking-[0.35em] text-warmGrey">
         <ClueList
           label="Across"
           words={puzzle.words}
@@ -312,7 +312,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
       </div>
       <div className="flex min-h-0 flex-1 items-center justify-center">
         <div
-          className="grid w-full min-w-0 gap-1.5"
+          className="grid w-full min-w-0 gap-1.5 sm:gap-2.5"
           style={{ gridTemplateColumns: `repeat(${puzzle.grid[0].length}, minmax(0, 1fr))` }}
         >
           {puzzle.grid.map((row, rowIndex) =>
@@ -330,7 +330,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
                 <button
                   key={`${rowIndex}-${colIndex}`}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
-                  className={`flex aspect-square min-h-0 min-w-0 items-center justify-center rounded-[14px] border border-white/60 bg-white/80 font-serif text-xl text-charcoal shadow-subtle transition-all duration-200 ease-gentle hover:-translate-y-0.5 ${
+                  className={`flex aspect-square min-h-0 min-w-0 items-center justify-center rounded-[10px] sm:rounded-[14px] border border-white/60 bg-white/80 font-serif text-base sm:text-2xl text-charcoal shadow-subtle transition-all duration-200 ease-gentle hover:-translate-y-0.5 ${
                     isActiveCell
                       ? "ring-2 ring-[#C6A77D]"
                       : isWordCell

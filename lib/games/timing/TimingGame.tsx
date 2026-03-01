@@ -120,11 +120,11 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
   const indicatorPosition = `${progress}%`;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <p className="text-center text-[10px] uppercase tracking-[0.35em] text-charcoal/55">
         Round {round + 1} of {TOTAL_ROUNDS} · {style}
       </p>
-      <p className="text-center text-base text-charcoal/70">Tap once as the pulse drifts softly through the calm band.</p>
+      <p className="text-center text-sm sm:text-base text-charcoal/70">Tap once as the pulse drifts softly through the calm band.</p>
       <button
         type="button"
         onClick={handleTap}
