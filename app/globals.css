@@ -4,14 +4,21 @@
 
 :root {
   color-scheme: light;
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
 }
 
 * {
   font-feature-settings: "liga" 1, "kern" 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  touch-action: manipulation;
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: #F8F6F2;
 }
 

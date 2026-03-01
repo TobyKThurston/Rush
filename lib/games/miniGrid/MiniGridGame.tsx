@@ -294,7 +294,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
         <p className="text-[10px] uppercase tracking-[0.35em] text-warmGrey">Mini Grid</p>
         <p className="mt-2 text-xs uppercase tracking-[0.32em] text-charcoal/55">{puzzle.title} Crossword</p>
       </div>
-      <div className="grid grid-cols-2 gap-8 text-xs uppercase tracking-[0.35em] text-warmGrey">
+      <div className="grid grid-cols-2 gap-4 overflow-y-auto text-xs uppercase tracking-[0.35em] text-warmGrey">
         <ClueList
           label="Across"
           words={puzzle.words}
@@ -310,15 +310,15 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
           onSelect={selectWord}
         />
       </div>
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex min-h-0 flex-1 items-center justify-center">
         <div
-          className="grid gap-2.5"
+          className="grid w-full min-w-0 gap-1.5"
           style={{ gridTemplateColumns: `repeat(${puzzle.grid[0].length}, minmax(0, 1fr))` }}
         >
           {puzzle.grid.map((row, rowIndex) =>
             row.map((cell, colIndex) => {
               if (!cell) {
-                return <div key={`${rowIndex}-${colIndex}`} className="h-14 w-14 rounded-[14px] bg-transparent" />;
+                return <div key={`${rowIndex}-${colIndex}`} className="aspect-square rounded-[14px] bg-transparent" />;
               }
               const isWordCell = activeWord.positions.some(([r, c]) => r === rowIndex && c === colIndex);
               const isRowOrColActive =
@@ -330,7 +330,7 @@ const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
                 <button
                   key={`${rowIndex}-${colIndex}`}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
-                  className={`flex h-14 w-14 items-center justify-center rounded-[14px] border border-white/60 bg-white/80 font-serif text-2xl text-charcoal shadow-subtle transition-all duration-200 ease-gentle hover:-translate-y-0.5 ${
+                  className={`flex aspect-square min-h-0 min-w-0 items-center justify-center rounded-[14px] border border-white/60 bg-white/80 font-serif text-xl text-charcoal shadow-subtle transition-all duration-200 ease-gentle hover:-translate-y-0.5 ${
                     isActiveCell
                       ? "ring-2 ring-[#C6A77D]"
                       : isWordCell

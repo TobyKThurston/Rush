@@ -6,7 +6,10 @@ const CenteredStageLayout = ({ children }: { children: ReactNode }) => {
     <main className="px-4" style={{ paddingTop: `${HEADER_H}px` }}>
       <section
         className="flex items-center justify-center"
-        style={{ minHeight: `calc(100vh - ${HEADER_H}px)` }}
+        style={{
+          minHeight: `calc(100dvh - ${HEADER_H}px)`,
+          paddingBottom: "env(safe-area-inset-bottom)"
+        }}
       >
         {children}
       </section>

@@ -8,7 +8,7 @@ type GameStageProps = {
 
 const GameStage = ({ children, className, label }: GameStageProps) => {
   return (
-    <div className="w-full max-w-[720px]">
+    <div className="w-full max-w-[720px] max-h-[calc(100dvh-var(--header-h,84px)-2rem)]">
       {label && (
         <p className="mb-4 text-center text-sm uppercase tracking-[0.4em] text-warmGrey/80">{label}</p>
       )}

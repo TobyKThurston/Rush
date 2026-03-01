@@ -170,7 +170,7 @@ const ZipPuzzleGame = ({ onSuccess, status }: GameProps) => {
                     return (
                       <div
                         key={key}
-                        className={`m-[2px] flex items-center justify-center rounded-[16px] border border-white/60 text-charcoal shadow-sm transition-all duration-200 ease-gentle ${
+                        className={`m-[1px] flex items-center justify-center rounded-[16px] border border-white/60 text-charcoal shadow-sm transition-all duration-200 ease-gentle ${
                           tone
                         } ${isActive ? "shadow-[0_8px_20px_rgba(198,167,125,0.35)]" : ""} ${shakeKey === key ? "animate-zipShake" : ""}`}
                       >

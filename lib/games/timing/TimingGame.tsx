@@ -129,6 +129,7 @@ const TimingGame = ({ onSuccess, onFail, status }: GameProps) => {
         type="button"
         onClick={handleTap}
         className="relative h-40 w-full rounded-[30px] border border-white/70 bg-ivory/75"
+        style={{ touchAction: "none" }}
       >
         <div className="absolute inset-x-8 top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-transparent via-warmGrey/50 to-transparent" />
         <div

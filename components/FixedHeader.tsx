@@ -14,8 +14,8 @@ const FixedHeader = ({ timeElapsed, phase, currentIndex, totalStages, penaltyCou
   const formattedTime = formatTime(timeElapsed);
   return (
     <header
-      className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between border-b border-white/70 bg-ivory/85 px-6 text-xs uppercase tracking-[0.3em] text-warmGrey/90 backdrop-blur"
-      style={{ height: `${HEADER_H}px` }}
+      className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between border-b border-white/70 bg-ivory/85 px-4 sm:px-6 text-xs uppercase tracking-[0.3em] text-warmGrey/90 backdrop-blur"
+      style={{ height: `${HEADER_H}px`, paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="flex items-center gap-4 text-[11px]">
         <Link href="/" className="tracking-[0.35em] text-charcoal/70 hover:text-charcoal">
