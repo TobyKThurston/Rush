@@ -1,3 +1,5 @@
+"use client";
+
 import GameStage from "@/components/GameStage";
 import DailySuccessOverlay from "@/components/DailySuccessOverlay";
 import RunEngine from "@/components/RunEngine";
