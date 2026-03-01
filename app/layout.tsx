@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "The Rush",
+  title: "The Apex",
   description: "A quiet luxury-inspired 30-second daily game",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "The Rush" }
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "The Apex" }
 };
 
 export const viewport: Viewport = {

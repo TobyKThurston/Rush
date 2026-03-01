@@ -1,7 +1,7 @@
-import type { RushGame } from "@/types/Game";
+import type { ApexGame } from "@/types/Game";
 import EliminateGame from "./EliminateGame";
 
-export const eliminateGame: RushGame = {
+export const eliminateGame: ApexGame = {
   id: "eliminate",
   name: "Eliminate",
   description: "Identify the lone element that breaks the quiet pattern.",

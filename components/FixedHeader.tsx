@@ -33,7 +33,7 @@ const FixedHeader = ({ timeElapsed, phase, currentIndex, totalStages, penaltyCou
 
       {/* Center: title + progress dots */}
       <div className="flex flex-col items-center gap-1 sm:gap-1.5">
-        <span className="font-serif text-lg sm:text-2xl tracking-[0.25em] sm:tracking-[0.4em] text-charcoal">THE RUSH</span>
+        <span className="font-serif text-lg sm:text-2xl tracking-[0.25em] sm:tracking-[0.4em] text-charcoal">THE APEX</span>
         <div className="flex items-center gap-2 sm:gap-2.5">
           {Array.from({ length: totalStages }).map((_, idx) => {
             const isComplete = idx < currentIndex;

@@ -1,13 +1,13 @@
 "use client";
 
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { GameEventPayload, RushGame } from "@/types/Game";
+import type { GameEventPayload, ApexGame } from "@/types/Game";
 import SunriseCountdown from "./SunriseCountdown";
 
 const DEFAULT_TIME_PENALTY = 5;
-const DEBUG_RUSH = process.env.NEXT_PUBLIC_RUSH_DEBUG === "1";
-const STORAGE_KEY = "rush:dailyRun";
-const DAILY_META_KEY = "rush:dailyMeta";
+const DEBUG_APEX = process.env.NEXT_PUBLIC_APEX_DEBUG === "1";
+const STORAGE_KEY = "apex:dailyRun";
+const DAILY_META_KEY = "apex:dailyMeta";
 
 const getDailyResetTime = (now: Date) => {
   const reset = new Date(now);
@@ -29,7 +29,7 @@ const getDailyWindowKey = (now: Date = new Date()) => {
 
 type RunEngineState = {
   phase: "idle" | "playing" | "finished";
-  currentGame: RushGame | null;
+  currentGame: ApexGame | null;
   currentIndex: number;
   totalStages: number;
   score: number;
@@ -43,7 +43,7 @@ type RunEngineState = {
 };
 
 type RunEngineProps = {
-  games: RushGame[];
+  games: ApexGame[];
   totalTime?: number;
   sequenceLength?: number;
   children: (state: RunEngineState) => ReactNode;
@@ -52,7 +52,7 @@ type RunEngineProps = {
 const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunEngineProps) => {
   const stageCount = sequenceLength ?? games.length;
   const [phase, setPhase] = useState<"idle" | "playing" | "finished">("idle");
-  const [sequence, setSequence] = useState<RushGame[]>([]);
+  const [sequence, setSequence] = useState<ApexGame[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -153,7 +153,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       const gameLookup = new Map(games.map((game) => [game.id, game]));
       const restoredSequence = parsed.sequenceIds
         .map((id) => gameLookup.get(id))
-        .filter((game): game is RushGame => Boolean(game));
+        .filter((game): game is ApexGame => Boolean(game));
 
       // If any saved game is no longer available (e.g. removed from dailyGames),
       // the saved run is stale — discard it rather than restoring a broken sequence.
@@ -173,8 +173,8 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       setShareNote(null);
       setRunFailed(false);
 
-      if (DEBUG_RUSH) {
-        console.log("[Rush][restore]", {
+      if (DEBUG_APEX) {
+        console.log("[Apex][restore]", {
           currentIndex: parsed.currentIndex ?? 0,
           totalStages: restoredSequence.length,
           timeElapsed: parsed.timeElapsed ?? 0
@@ -189,7 +189,7 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
     // Clear any saved progress so a fresh run always starts clean.
     clearProgress();
 
-    const selection: RushGame[] = [];
+    const selection: ApexGame[] = [];
     const shuffled = [...games];
     for (let i = 0; i < (stageCount || 1); i += 1) {
       if (i % shuffled.length === 0) {
@@ -253,8 +253,8 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
       const isFinalStage = stageIndexValue >= (stageCount || 1) - 1;
       const nextIndex = stageIndexValue + 1;
 
-      if (DEBUG_RUSH) {
-        console.log("[Rush][advance]", {
+      if (DEBUG_APEX) {
+        console.log("[Apex][advance]", {
           source,
           currentIndex: stageIndexValue,
           totalStages: stageCount || 1,
@@ -405,10 +405,10 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, children }: RunE
         {!runFailed && (
           <button
             onClick={async () => {
-              const payload = `Completed THE RUSH in ${formattedTime}.`;
+              const payload = `Completed THE APEX in ${formattedTime}.`;
               try {
                 if (navigator.share) {
-                  await navigator.share({ title: "The Rush", text: payload });
+                  await navigator.share({ title: "The Apex", text: payload });
                   setShareNote("Shared.");
                   return;
                 }

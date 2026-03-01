@@ -91,7 +91,7 @@ const Title = () => {
         hovered ? "tracking-[0.28em]" : ""
       }`}
     >
-      THE RUSH
+      THE APEX
     </h1>
   );
 };

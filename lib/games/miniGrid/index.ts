@@ -1,7 +1,7 @@
-import type { RushGame } from "@/types/Game";
+import type { ApexGame } from "@/types/Game";
 import MiniGridGame from "./MiniGridGame";
 
-export const miniGridGame: RushGame = {
+export const miniGridGame: ApexGame = {
   id: "miniGrid",
   name: "Mini Grid",
   description: "Fill the composed micro-grid with precise intent.",

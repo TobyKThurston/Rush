@@ -14,7 +14,7 @@ export default function HomePage() {
       <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-3xl flex-col items-center justify-center gap-8 text-center">
         <p className="text-[10px] font-medium uppercase tracking-[0.45em] text-warmGrey">Edition 01</p>
         <p className="text-xs uppercase tracking-[0.4em] text-warmGrey">A daily practice in speed and focus</p>
-        <h1 className="text-balance font-serif text-5xl leading-[0.95] tracking-[0.12em] sm:text-6xl md:text-7xl">THE RUSH</h1>
+        <h1 className="text-balance font-serif text-5xl leading-[0.95] tracking-[0.12em] sm:text-6xl md:text-7xl">THE APEX</h1>
         <p className="max-w-xl text-sm leading-relaxed text-charcoal/75 sm:text-base">
           One sharp sequence each morning. Minimal surface, high pressure core. Built to feel composed until the clock
           starts.

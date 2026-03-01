@@ -6,7 +6,7 @@ import { miniGridPuzzles, type MiniGridPuzzle } from "./data";
 
 const BASE_SCORE = 50;
 const TIME_PENALTY = 5;
-const DEBUG_MINI = process.env.NEXT_PUBLIC_RUSH_DEBUG === "1";
+const DEBUG_MINI = process.env.NEXT_PUBLIC_APEX_DEBUG === "1";
 
 const MiniGridGame = ({ onSuccess, onFail }: GameProps) => {
   const puzzle = useMemo<MiniGridPuzzle>(

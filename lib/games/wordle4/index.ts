@@ -1,7 +1,7 @@
-import type { RushGame } from "@/types/Game";
+import type { ApexGame } from "@/types/Game";
 import Wordle4Game from "./Wordle4Game";
 
-export const wordle4Game: RushGame = {
+export const wordle4Game: ApexGame = {
   id: "wordle4",
   name: "Wordle 4",
   description: "Find the hidden 4-letter word in six guesses.",

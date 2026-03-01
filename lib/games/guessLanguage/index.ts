@@ -1,7 +1,7 @@
-import type { RushGame } from "@/types/Game";
+import type { ApexGame } from "@/types/Game";
 import GuessLanguageGame from "./GuessLanguageGame";
 
-export const guessLanguageGame: RushGame = {
+export const guessLanguageGame: ApexGame = {
   id: "guessLanguage",
   name: "Guess Language",
   description: "Read a phrase and identify its language from three choices.",

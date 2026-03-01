@@ -19,7 +19,7 @@ export interface GameProps {
   status?: GameStatusContext;
 }
 
-export interface RushGame {
+export interface ApexGame {
   id: string;
   name: string;
   description: string;
