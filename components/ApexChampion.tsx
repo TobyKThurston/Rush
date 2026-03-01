@@ -33,11 +33,9 @@ export default function ApexChampion() {
     } catch {}
   }, []);
 
-  if (!name) return null;
-
   return (
     <p className="text-[10px] uppercase tracking-[0.38em] text-warmGrey">
-      Current Apex: <span className="font-medium text-charcoal">{name}</span>
+      Current Apex: <span className="font-medium text-charcoal">{name ?? "None"}</span>
     </p>
   );
 }
