@@ -1,5 +1,8 @@
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import SunriseCountdown from "@/components/SunriseCountdown";
+
+const ApexChampion = dynamic(() => import("@/components/ApexChampion"), { ssr: false });
 
 export default function HomePage() {
   return (
@@ -19,6 +22,8 @@ export default function HomePage() {
           One sharp sequence each morning. Minimal surface, high pressure core. Built to feel composed until the clock
           starts.
         </p>
+
+        <ApexChampion />
 
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link

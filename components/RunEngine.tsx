@@ -9,6 +9,7 @@ const DEFAULT_TIME_PENALTY = 5;
 const DEBUG_APEX = process.env.NEXT_PUBLIC_APEX_DEBUG === "1";
 const STORAGE_KEY = "apex:dailyRun";
 const DAILY_META_KEY = "apex:dailyMeta";
+const CHAMPION_KEY = "apex:champion";
 
 const getDailyResetTime = (now: Date) => {
   const reset = new Date(now);
@@ -68,6 +69,9 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, mode = "free", c
   const [storedScore, setStoredScore] = useState(0);
   const [storedTimeElapsed, setStoredTimeElapsed] = useState(0);
   const [penaltyCount, setPenaltyCount] = useState(0);
+  const [isNewChampion, setIsNewChampion] = useState(false);
+  const [championNameInput, setChampionNameInput] = useState("");
+  const [championClaimed, setChampionClaimed] = useState(false);
   const [activeDailySeed, setActiveDailySeed] = useState<number | null>(null);
   const pendingAdvance = useRef<{ stageIndex: number } | null>(null);
   const advanceGuard = useRef(false);
@@ -161,6 +165,20 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, mode = "free", c
     if (phase !== "finished" || runFailed) return;
     lockTodayRun(score, timeElapsed);
   }, [mode, phase, runFailed, score, timeElapsed, lockTodayRun]);
+
+  // Detect new Apex champion
+  useEffect(() => {
+    if (phase !== "finished") return;
+    if (penaltyCount > 0 || runFailed || mode !== "daily") return;
+    try {
+      const raw = localStorage.getItem(CHAMPION_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.windowKey === getDailyWindowKey() && parsed.timeElapsed <= timeElapsed) return;
+      }
+      setIsNewChampion(true);
+    } catch {}
+  }, [phase, penaltyCount, runFailed, mode, timeElapsed]);
 
   useEffect(() => {
     if (phase !== "idle") return;
@@ -260,6 +278,9 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, mode = "free", c
     setRunFailed(false);
     setPenaltyCount(0);
     setSuccessOverlay(null);
+    setIsNewChampion(false);
+    setChampionNameInput("");
+    setChampionClaimed(false);
 
     persistProgress({
       phase: "playing",
@@ -396,6 +417,14 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, mode = "free", c
     advanceToNextGame(stageIndex, "success");
   }, [advanceToNextGame]);
 
+  const claimChampion = useCallback((name: string) => {
+    try {
+      localStorage.setItem(CHAMPION_KEY, JSON.stringify({ name, timeElapsed, windowKey: getDailyWindowKey() }));
+    } catch {}
+    setChampionClaimed(true);
+    setIsNewChampion(false);
+  }, [timeElapsed]);
+
   const formattedTime = formatTime(timeElapsed);
 
   useEffect(() => {
@@ -491,6 +520,30 @@ const RunEngine = ({ games, totalTime = 20, sequenceLength = 5, mode = "free", c
           >
             Play Again
           </button>
+        )}
+        {isNewChampion && !championClaimed && (
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-xs uppercase tracking-[0.3em] text-rosegold">You set the record!</p>
+            <input
+              value={championNameInput}
+              onChange={e => setChampionNameInput(e.target.value)}
+              maxLength={20}
+              placeholder="Your name"
+              className="rounded-full border border-charcoal/20 bg-white/70 px-6 py-2 text-sm text-center text-charcoal outline-none"
+            />
+            <button
+              onClick={() => claimChampion(championNameInput.trim())}
+              disabled={!championNameInput.trim()}
+              className="rounded-full border border-charcoal bg-charcoal px-8 py-2 text-xs uppercase tracking-[0.28em] text-ivory disabled:opacity-40"
+            >
+              Claim Apex
+            </button>
+          </div>
+        )}
+        {championClaimed && (
+          <p className="text-xs uppercase tracking-[0.3em] text-charcoal/50">
+            Apex claimed. See you tomorrow.
+          </p>
         )}
       </div>
     );
